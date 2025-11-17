@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recording Studio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Recording Studio</h1>
+    </header>
+    <main>
+        <section id="controls">
+            <h2>Recording Controls</h2>
+            <button id="recordBtn">Record</button>
+            <button id="stopBtn">Stop</button>
+            <button id="playBtn">Play</button>
+        </section>
+        <section id="multi-track">
+            <h2>Multi-Track Display</h2>
+            <div id="trackContainer">
+                <!-- Dynamic Track Display Here -->
+            </div>
+        </section>
+        <section id="file-controls">
+            <h2>File Upload/Download</h2>
+            <input type="file" id="fileUpload">
+            <button id="uploadBtn">Upload</button>
+            <button id="downloadBtn">Download</button>
+        </section>
+        <section id="effects-controls">
+            <h2>Effects Controls</h2>
+            <label for="effects">Choose an effect:</label>
+            <select id="effects">
+                <option value="reverb">Reverb</option>
+                <option value="echo">Echo</option>
+                <option value="compressor">Compressor</option>
+            </select>
+            <button id="applyEffectBtn">Apply Effect</button>
+        </section>
+        <section id="auto-tune">
+            <h2>Auto-Tune Interface</h2>
+            <label>
+                <input type="checkbox" id="autoTuneToggle"> Enable Auto-Tune
+            </label>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Recording Studio</p>
+    </footer>
+</body>
+</html>
