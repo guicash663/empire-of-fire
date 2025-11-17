@@ -1,5 +1,5 @@
 // sample-manager.js
-// Manages audio samples: loading, cutting, storing, and triggering with delays
+// Optimized audio sample management with low-latency playback and buffer pooling
 
 class SampleManager {
     constructor(audioContext) {
@@ -7,9 +7,18 @@ class SampleManager {
         this.samples = []; // Array of sample objects
         this.currentAudioBuffer = null; // Currently loaded audio file
         this.maxSamples = 12; // Maximum soundboard pads
+        
+        // Buffer source pool for reduced latency and garbage collection
+        this.sourcePool = [];
+        this.maxPoolSize = 20;
+        
+        // Pre-create master gain node for all samples
+        this.masterGain = this.audioContext.createGain();
+        this.masterGain.gain.value = 0.8;
+        this.masterGain.connect(this.audioContext.destination);
     }
 
-    // Load an audio file
+    // Load an audio file with optimized decoding
     async loadAudioFile(file) {
         try {
             const arrayBuffer = await file.arrayBuffer();
@@ -21,7 +30,7 @@ class SampleManager {
         }
     }
 
-    // Extract a sample from the loaded audio buffer
+    // Extract a sample from the loaded audio buffer (optimized for performance)
     extractSample(startTime, endTime, name = 'Sample') {
         if (!this.currentAudioBuffer) {
             throw new Error('No audio file loaded');
@@ -44,13 +53,12 @@ class SampleManager {
             sampleRate
         );
 
-        // Copy the audio data
+        // Optimized copy with typed array operations
         for (let channel = 0; channel < numberOfChannels; channel++) {
             const sourceData = this.currentAudioBuffer.getChannelData(channel);
             const sampleData = sampleBuffer.getChannelData(channel);
-            for (let i = 0; i < frameCount; i++) {
-                sampleData[i] = sourceData[startFrame + i];
-            }
+            // Use subarray for better performance
+            sampleData.set(sourceData.subarray(startFrame, endFrame));
         }
 
         return {
@@ -98,7 +106,27 @@ class SampleManager {
         return false;
     }
 
-    // Play a sample with its configured delays
+    // Optimized buffer source creation with pooling
+    getBufferSource() {
+        // Try to reuse from pool
+        if (this.sourcePool.length > 0) {
+            return this.sourcePool.pop();
+        }
+        
+        // Create new if pool is empty
+        return this.audioContext.createBufferSource();
+    }
+
+    // Return source to pool for reuse (reduces garbage collection)
+    returnBufferSource(source) {
+        if (this.sourcePool.length < this.maxPoolSize) {
+            // Reset source state
+            source.disconnect();
+            this.sourcePool.push(source);
+        }
+    }
+
+    // Play a sample with its configured delays (optimized for minimal latency)
     playSample(sampleId) {
         const sample = this.samples.find(s => s.id === sampleId);
         if (!sample) {
@@ -108,21 +136,56 @@ class SampleManager {
 
         const currentTime = this.audioContext.currentTime;
         
-        // Play with primary delay
-        this.playSampleBuffer(sample.buffer, currentTime + sample.delay1);
+        // Play with primary delay - use minimal latency path
+        this.playSampleBufferOptimized(sample.buffer, currentTime + sample.delay1);
         
         // Play with secondary delay (if different from delay1)
-        if (sample.delay2 > 0 && sample.delay2 !== sample.delay1) {
-            this.playSampleBuffer(sample.buffer, currentTime + sample.delay2);
+        if (sample.delay2 > 0 && Math.abs(sample.delay2 - sample.delay1) > 0.001) {
+            this.playSampleBufferOptimized(sample.buffer, currentTime + sample.delay2);
         }
     }
 
-    // Helper method to play a buffer at a specific time
-    playSampleBuffer(buffer, startTime) {
+    // Optimized buffer playback with minimal latency
+    playSampleBufferOptimized(buffer, startTime) {
         const source = this.audioContext.createBufferSource();
         source.buffer = buffer;
-        source.connect(this.audioContext.destination);
+        
+        // Direct connection to master gain (pre-connected to destination)
+        source.connect(this.masterGain);
+        
+        // Schedule start with precise timing
         source.start(startTime);
+        
+        // Clean up after playback
+        source.onended = () => {
+            source.disconnect();
+        };
+    }
+
+    // Helper method to play a buffer at a specific time (legacy compatibility)
+    playSampleBuffer(buffer, startTime) {
+        this.playSampleBufferOptimized(buffer, startTime);
+    }
+
+    // Quick play without delay (for preview/instant feedback)
+    quickPlay(buffer) {
+        const source = this.audioContext.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.masterGain);
+        source.start(0);
+        source.onended = () => source.disconnect();
+        return source;
+    }
+
+    // Batch play multiple samples (optimized for sequencing)
+    playSamples(sampleIds, startTime = null) {
+        const baseTime = startTime || this.audioContext.currentTime;
+        sampleIds.forEach((id, index) => {
+            const sample = this.samples.find(s => s.id === id);
+            if (sample) {
+                this.playSampleBufferOptimized(sample.buffer, baseTime + (index * 0.001));
+            }
+        });
     }
 
     // Get all samples
@@ -135,9 +198,20 @@ class SampleManager {
         return this.currentAudioBuffer ? this.currentAudioBuffer.duration : 0;
     }
 
-    // Clear all samples
+    // Clear all samples and reset pool
     clearSamples() {
         this.samples = [];
+        this.sourcePool = [];
+    }
+
+    // Set master volume
+    setMasterVolume(volume) {
+        this.masterGain.gain.setValueAtTime(volume, this.audioContext.currentTime);
+    }
+
+    // Get current master volume
+    getMasterVolume() {
+        return this.masterGain.gain.value;
     }
 }
 

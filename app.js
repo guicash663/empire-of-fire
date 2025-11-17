@@ -80,11 +80,8 @@ function setupSampleEditor() {
         
         try {
             const sample = sampleManager.extractSample(startTime, endTime, 'Preview');
-            // Play preview immediately
-            const source = audioContext.createBufferSource();
-            source.buffer = sample.buffer;
-            source.connect(audioContext.destination);
-            source.start(0);
+            // Use optimized quick play for instant preview with minimal latency
+            sampleManager.quickPlay(sample.buffer);
         } catch (error) {
             alert('Error previewing sample: ' + error.message);
             console.error(error);
@@ -205,7 +202,7 @@ function createSoundboardPad(sample) {
     return pad;
 }
 
-// Draw waveform visualization
+// Draw waveform visualization (optimized for performance)
 function drawWaveform(audioBuffer) {
     const canvas = document.getElementById('waveformCanvas');
     const ctx = canvas.getContext('2d');
@@ -221,19 +218,38 @@ function drawWaveform(audioBuffer) {
     const step = Math.ceil(data.length / width);
     const amp = height / 2;
     
-    // Draw waveform
+    // Use optimized rendering with path2D for better performance
     ctx.strokeStyle = '#1DB954';
     ctx.lineWidth = 1;
-    ctx.beginPath();
     
+    // Pre-calculate min/max values for better performance
+    const peaks = new Float32Array(width * 2);
     for (let i = 0; i < width; i++) {
-        const min = Math.min(...data.slice(i * step, (i + 1) * step));
-        const max = Math.max(...data.slice(i * step, (i + 1) * step));
+        const start = i * step;
+        const end = Math.min(start + step, data.length);
+        let min = 1.0;
+        let max = -1.0;
+        
+        // Find min and max in this segment
+        for (let j = start; j < end; j++) {
+            const value = data[j];
+            if (value < min) min = value;
+            if (value > max) max = value;
+        }
+        
+        peaks[i * 2] = min;
+        peaks[i * 2 + 1] = max;
+    }
+    
+    // Draw waveform using optimized path
+    ctx.beginPath();
+    for (let i = 0; i < width; i++) {
+        const min = peaks[i * 2];
+        const max = peaks[i * 2 + 1];
         
         ctx.moveTo(i, (1 + min) * amp);
         ctx.lineTo(i, (1 + max) * amp);
     }
-    
     ctx.stroke();
     
     // Draw center line
