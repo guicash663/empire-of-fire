@@ -1,0 +1,40 @@
+{
+  "name": "empire-of-fire-music-studio",
+  "version": "1.0.0",
+  "description": "A professional music recording studio application for Android",
+  "main": "index.html",
+  "scripts": {
+    "android:build": "cordova build android",
+    "android:run": "cordova run android",
+    "android:release": "cordova build android --release",
+    "prepare": "cordova prepare",
+    "clean": "cordova clean"
+  },
+  "keywords": [
+    "music",
+    "recording",
+    "studio",
+    "audio",
+    "android"
+  ],
+  "author": "Empire of Fire",
+  "license": "MIT",
+  "devDependencies": {
+    "cordova": "^12.0.0",
+    "cordova-android": "^12.0.0"
+  },
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-media": {},
+      "cordova-plugin-media-capture": {},
+      "cordova-plugin-file": {},
+      "cordova-plugin-file-transfer": {},
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-splashscreen": {}
+    }
+  }
+}

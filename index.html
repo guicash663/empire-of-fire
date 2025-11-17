@@ -2,20 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recording Studio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+    <title>Empire of Fire Music Studio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Recording Studio</h1>
+        <h1>🎵 Empire of Fire Music Studio</h1>
     </header>
     <main>
         <section id="controls">
             <h2>Recording Controls</h2>
-            <button id="recordBtn">Record</button>
-            <button id="stopBtn">Stop</button>
-            <button id="playBtn">Play</button>
+            <button id="recordBtn" class="button">🔴 Record</button>
+            <button id="stopBtn" class="button">⏹️ Stop</button>
+            <button id="playBtn" class="button">▶️ Play</button>
+        </section>
+        <section id="visualizer-section">
+            <h2>Waveform Visualizer</h2>
+            <canvas id="waveform" width="800" height="200"></canvas>
         </section>
         <section id="multi-track">
             <h2>Multi-Track Display</h2>
@@ -25,9 +30,9 @@
         </section>
         <section id="file-controls">
             <h2>File Upload/Download</h2>
-            <input type="file" id="fileUpload">
-            <button id="uploadBtn">Upload</button>
-            <button id="downloadBtn">Download</button>
+            <input type="file" id="fileUpload" accept="audio/*">
+            <button id="uploadBtn" class="button">📤 Upload</button>
+            <button id="downloadBtn" class="button">💾 Download</button>
         </section>
         <section id="effects-controls">
             <h2>Effects Controls</h2>
@@ -37,7 +42,7 @@
                 <option value="echo">Echo</option>
                 <option value="compressor">Compressor</option>
             </select>
-            <button id="applyEffectBtn">Apply Effect</button>
+            <button id="applyEffectBtn" class="button">✨ Apply Effect</button>
         </section>
         <section id="auto-tune">
             <h2>Auto-Tune Interface</h2>
@@ -45,9 +50,25 @@
                 <input type="checkbox" id="autoTuneToggle"> Enable Auto-Tune
             </label>
         </section>
+        <section id="synths">
+            <h2>Synthesizers</h2>
+            <button id="guitarBtn" class="button">🎸 Guitar</button>
+            <button id="kickBtn" class="button">🥁 Kick</button>
+            <button id="snareBtn" class="button">🥁 Snare</button>
+        </section>
     </main>
     <footer>
-        <p>&copy; 2025 Recording Studio</p>
+        <p>&copy; 2025 Empire of Fire Music Studio</p>
     </footer>
+    
+    <!-- Cordova Script -->
+    <script src="cordova.js"></script>
+    
+    <!-- Application Scripts -->
+    <script type="module" src="audio-engine.js"></script>
+    <script type="module" src="effects.js"></script>
+    <script type="module" src="synths.js"></script>
+    <script src="visualizer.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

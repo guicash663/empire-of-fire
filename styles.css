@@ -10,6 +10,7 @@ body {
     background-color: #121212; /* Dark background */
     color: #E0E0E0; /* Light text */
     line-height: 1.6;
+    padding: 10px;
 }
 
 /* Responsive Layout */
@@ -21,26 +22,69 @@ body {
 
 /* Header Styles */
 header {
+    text-align: center;
+    padding: 20px 0;
+    border-bottom: 2px solid #1DB954;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    font-size: 1.8em;
+    color: #1DB954;
+}
+
+/* Main Section Styles */
+main {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #333;
+    flex-direction: column;
+    gap: 20px;
+}
+
+section {
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+section h2 {
+    color: #1DB954;
+    margin-bottom: 15px;
+    font-size: 1.3em;
 }
 
 /* Control Styles */
-.button {
+.button,
+button {
     background-color: #1DB954; /* Spotify green */
     color: #ffffff;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
+    font-size: 1em;
+    font-weight: bold;
+    margin: 5px;
+    min-width: 120px;
 }
 
-.button:hover {
+.button:hover,
+button:hover {
     background-color: #1AA34A; /* Darker green on hover */
+    transform: scale(1.05);
+}
+
+.button:active,
+button:active {
+    transform: scale(0.95);
+}
+
+.button:disabled,
+button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 /* Responsive grid layout for controls */
@@ -51,24 +95,161 @@ header {
     margin-top: 20px;
 }
 
+#controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+#synths {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Canvas styles */
+canvas {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    display: block;
+    margin: 0 auto;
+}
+
+#visualizer-section {
+    text-align: center;
+}
+
 /* Input styles */
 input[type="text"],
-input[type="range"] {
+input[type="range"],
+input[type="file"] {
     background-color: #333;
     color: #E0E0E0;
     border: 1px solid #555;
     border-radius: 5px;
     padding: 10px;
+    width: 100%;
+    max-width: 300px;
+    margin: 5px;
 }
 
 input[type="text"]:focus,
-input[type="range"]:focus {
+input[type="range"]:focus,
+input[type="file"]:focus {
     border-color: #1DB954;
+    outline: none;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Select styles */
+select {
+    background-color: #333;
+    color: #E0E0E0;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1em;
+    cursor: pointer;
+    margin: 5px;
+    min-width: 150px;
+}
+
+select:focus {
+    border-color: #1DB954;
+    outline: none;
+}
+
+/* Label styles */
+label {
+    display: flex;
+    align-items: center;
+    font-size: 1.1em;
+    cursor: pointer;
+}
+
+/* File controls */
+#file-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Effects controls */
+#effects-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Multi-track container */
+#trackContainer {
+    min-height: 100px;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 10px;
 }
 
 /* Footer Styles */
 footer {
     text-align: center;
     padding: 20px 0;
-    border-top: 1px solid #333;
+    margin-top: 30px;
+    border-top: 2px solid #1DB954;
+    color: #888;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.4em;
+    }
+    
+    section h2 {
+        font-size: 1.1em;
+    }
+    
+    .button,
+    button {
+        padding: 10px 20px;
+        font-size: 0.9em;
+        min-width: 100px;
+    }
+    
+    canvas {
+        height: 150px;
+    }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    section {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.2em;
+    }
+    
+    .button,
+    button {
+        width: 100%;
+        margin: 5px 0;
+    }
 }
