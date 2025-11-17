@@ -72,3 +72,163 @@ footer {
     padding: 20px 0;
     border-top: 1px solid #333;
 }
+
+/* Soundboard Styles */
+.soundboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.soundboard-pad {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #555;
+    border-radius: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.soundboard-pad:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+}
+
+.soundboard-pad:active {
+    transform: scale(0.95);
+}
+
+.soundboard-pad h3 {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: white;
+}
+
+.soundboard-pad .delay-info {
+    font-size: 11px;
+    color: #ddd;
+    margin: 5px 0;
+}
+
+.soundboard-pad .controls {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.soundboard-pad input[type="number"] {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid #555;
+    background: #222;
+    color: white;
+    font-size: 11px;
+}
+
+.soundboard-pad button {
+    padding: 5px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+.soundboard-pad .play-btn {
+    background-color: #1DB954;
+    color: white;
+}
+
+.soundboard-pad .remove-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Sample Editor Styles */
+#sample-editor {
+    margin: 20px 0;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+}
+
+#waveformDisplay {
+    margin: 15px 0;
+    background: #000;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#waveformCanvas {
+    width: 100%;
+    display: block;
+}
+
+.sample-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.sample-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.sample-controls input[type="number"],
+.sample-controls input[type="text"] {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background: #222;
+    color: white;
+}
+
+.sample-controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #1DB954;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+.sample-controls button:hover {
+    background-color: #1AA34A;
+}
+
+/* Song Loader Styles */
+#sample-loader {
+    margin: 20px 0;
+    padding: 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+}
+
+#songInfo {
+    margin-top: 10px;
+    padding: 10px;
+    background: #222;
+    border-radius: 5px;
+    color: #1DB954;
+    font-size: 14px;
+}
+
+section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #1e1e1e;
+    border-radius: 8px;
+}
+
+section h2 {
+    margin-bottom: 15px;
+    color: #1DB954;
+}
