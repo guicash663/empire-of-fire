@@ -29,6 +29,31 @@
             <button id="uploadBtn">Upload</button>
             <button id="downloadBtn">Download</button>
         </section>
+        <section id="sample-loader">
+            <h2>Song Loader</h2>
+            <input type="file" id="songUpload" accept="audio/*">
+            <button id="loadSongBtn">Load Song</button>
+            <div id="songInfo"></div>
+        </section>
+        <section id="sample-editor">
+            <h2>Sample Cutter</h2>
+            <div id="waveformDisplay">
+                <canvas id="waveformCanvas" width="800" height="200"></canvas>
+            </div>
+            <div class="sample-controls">
+                <label>Start Time (s): <input type="number" id="startTime" min="0" step="0.01" value="0"></label>
+                <label>End Time (s): <input type="number" id="endTime" min="0" step="0.01" value="1"></label>
+                <label>Sample Name: <input type="text" id="sampleName" placeholder="Sample 1"></label>
+                <button id="previewSampleBtn">Preview Sample</button>
+                <button id="addToSoundboardBtn">Add to Soundboard</button>
+            </div>
+        </section>
+        <section id="soundboard">
+            <h2>Soundboard</h2>
+            <div id="soundboardPads" class="soundboard-grid">
+                <!-- Dynamic soundboard pads will be created here -->
+            </div>
+        </section>
         <section id="effects-controls">
             <h2>Effects Controls</h2>
             <label for="effects">Choose an effect:</label>
@@ -49,5 +74,6 @@
     <footer>
         <p>&copy; 2025 Recording Studio</p>
     </footer>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
