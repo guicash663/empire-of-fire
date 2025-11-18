@@ -213,7 +213,189 @@ function onDeviceReady() {
         });
     }
     
+    // Setup auto-tune guide controls
+    setupAutotuneGuide();
+    
     console.log('Application initialized successfully');
+}
+
+// Auto-tune guide variables
+let autotuneEnabled = false;
+let targetFrequency = 440.0;
+let autotuneY = null;
+let isDragging = false;
+
+// Setup auto-tune guide
+function setupAutotuneGuide() {
+    const autotuneToggle = document.getElementById('autotuneGuideToggle');
+    const targetPitchSelect = document.getElementById('targetPitch');
+    const pitchFineSlider = document.getElementById('pitchFine');
+    const pitchDisplay = document.getElementById('pitchDisplay');
+    const overlay = document.getElementById('autotuneOverlay');
+    
+    if (!autotuneToggle || !overlay) {
+        console.warn('Auto-tune elements not found');
+        return;
+    }
+    
+    // Toggle auto-tune guide
+    autotuneToggle.addEventListener('change', () => {
+        autotuneEnabled = autotuneToggle.checked;
+        if (!autotuneEnabled) {
+            clearAutotuneOverlay();
+        }
+    });
+    
+    // Update target frequency from select
+    targetPitchSelect.addEventListener('change', () => {
+        const baseFreq = parseFloat(targetPitchSelect.value);
+        const fineTune = parseInt(pitchFineSlider.value);
+        targetFrequency = baseFreq * Math.pow(2, fineTune / 1200); // 1200 cents = 1 octave
+        pitchDisplay.textContent = targetFrequency.toFixed(1) + ' Hz';
+    });
+    
+    // Update target frequency from fine tune slider
+    pitchFineSlider.addEventListener('input', () => {
+        const baseFreq = parseFloat(targetPitchSelect.value);
+        const fineTune = parseInt(pitchFineSlider.value);
+        targetFrequency = baseFreq * Math.pow(2, fineTune / 1200);
+        pitchDisplay.textContent = targetFrequency.toFixed(1) + ' Hz';
+    });
+    
+    // Make overlay interactive - drag to adjust pitch
+    overlay.addEventListener('mousedown', (e) => {
+        if (autotuneEnabled) {
+            isDragging = true;
+            updateAutotuneFromMouse(e, overlay);
+        }
+    });
+    
+    overlay.addEventListener('mousemove', (e) => {
+        if (isDragging && autotuneEnabled) {
+            updateAutotuneFromMouse(e, overlay);
+        }
+    });
+    
+    overlay.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+    
+    overlay.addEventListener('mouseleave', () => {
+        isDragging = false;
+    });
+    
+    // Touch support for mobile
+    overlay.addEventListener('touchstart', (e) => {
+        if (autotuneEnabled) {
+            isDragging = true;
+            updateAutotuneFromTouch(e, overlay);
+            e.preventDefault();
+        }
+    });
+    
+    overlay.addEventListener('touchmove', (e) => {
+        if (isDragging && autotuneEnabled) {
+            updateAutotuneFromTouch(e, overlay);
+            e.preventDefault();
+        }
+    });
+    
+    overlay.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+}
+
+function updateAutotuneFromMouse(e, overlay) {
+    const rect = overlay.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    autotuneY = y;
+    
+    // Convert Y position to frequency (inverse mapping)
+    const normalizedY = y / overlay.height;
+    const minFreq = 100;
+    const maxFreq = 1000;
+    targetFrequency = minFreq + (1 - normalizedY) * (maxFreq - minFreq);
+    
+    document.getElementById('pitchDisplay').textContent = targetFrequency.toFixed(1) + ' Hz';
+}
+
+function updateAutotuneFromTouch(e, overlay) {
+    const rect = overlay.getBoundingClientRect();
+    const touch = e.touches[0];
+    const y = touch.clientY - rect.top;
+    autotuneY = y;
+    
+    // Convert Y position to frequency
+    const normalizedY = y / overlay.height;
+    const minFreq = 100;
+    const maxFreq = 1000;
+    targetFrequency = minFreq + (1 - normalizedY) * (maxFreq - minFreq);
+    
+    document.getElementById('pitchDisplay').textContent = targetFrequency.toFixed(1) + ' Hz';
+}
+
+function clearAutotuneOverlay() {
+    const overlay = document.getElementById('autotuneOverlay');
+    if (overlay) {
+        const ctx = overlay.getContext('2d');
+        ctx.clearRect(0, 0, overlay.width, overlay.height);
+    }
+}
+
+function drawAutotuneGuide() {
+    if (!autotuneEnabled) return;
+    
+    const overlay = document.getElementById('autotuneOverlay');
+    if (!overlay) return;
+    
+    const ctx = overlay.getContext('2d');
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    
+    // Calculate Y position for target frequency
+    let yPos;
+    if (autotuneY !== null) {
+        yPos = autotuneY;
+    } else {
+        // Map frequency to canvas height
+        const minFreq = 100;
+        const maxFreq = 1000;
+        const normalizedFreq = (targetFrequency - minFreq) / (maxFreq - minFreq);
+        yPos = overlay.height * (1 - normalizedFreq);
+    }
+    
+    // Draw target pitch line
+    ctx.strokeStyle = '#FFD700'; // Gold color
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, yPos);
+    ctx.lineTo(overlay.width, yPos);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Draw sine wave at target frequency
+    ctx.strokeStyle = 'rgba(255, 215, 0, 0.4)'; // Semi-transparent gold
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    const wavelength = 50; // Visual wavelength for the sine wave
+    for (let x = 0; x < overlay.width; x++) {
+        const angle = (x / wavelength) * Math.PI * 2;
+        const amplitude = 15;
+        const y = yPos + Math.sin(angle) * amplitude;
+        
+        if (x === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+    ctx.stroke();
+    
+    // Draw frequency label
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 14px Arial';
+    ctx.fillText(`Target: ${targetFrequency.toFixed(1)} Hz`, 10, yPos - 10);
 }
 
 // Live feedback functions
@@ -270,6 +452,9 @@ function startLiveFeedback() {
         
         canvasContext.lineTo(canvas.width, canvas.height / 2);
         canvasContext.stroke();
+        
+        // Draw auto-tune guide overlay
+        drawAutotuneGuide();
         
         // Update level meter
         if (levelBar) {

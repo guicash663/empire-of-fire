@@ -72,6 +72,21 @@ Want to hear yourself while recording?
 
 ⚠️ **Warning**: Using live monitoring without headphones may cause audio feedback!
 
+### Using the Auto-Tune Pitch Guide
+
+The interactive auto-tune guide helps you stay on pitch:
+
+1. **Check "🎵 Show Auto-Tune Target Pitch"** to enable the guide
+2. **Select a target note** from the dropdown (C4, D4, E4, etc.)
+3. **Fine-tune the pitch** using the slider (±50 cents)
+4. **Drag the gold line** on the waveform to visually adjust the target pitch
+5. **Record and watch** - the gold line shows your target pitch, the green waveform shows your actual voice
+
+The auto-tune guide displays:
+- **Gold dashed line**: Target pitch center
+- **Gold sine wave**: Visual pitch reference
+- **Frequency display**: Current target in Hz
+
 ### Applying Effects
 
 1. Record or upload an audio track

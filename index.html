@@ -33,7 +33,31 @@
         </section>
         <section id="visualizer-section">
             <h2>Waveform Visualizer</h2>
-            <canvas id="waveform" width="800" height="200"></canvas>
+            <div class="visualizer-container">
+                <canvas id="waveform" width="800" height="200"></canvas>
+                <canvas id="autotuneOverlay" width="800" height="200"></canvas>
+            </div>
+            <div class="autotune-controls">
+                <label>
+                    <input type="checkbox" id="autotuneGuideToggle">
+                    <span>🎵 Show Auto-Tune Target Pitch</span>
+                </label>
+                <div class="pitch-control">
+                    <label for="targetPitch">Target Note:</label>
+                    <select id="targetPitch">
+                        <option value="261.63">C4 (Middle C)</option>
+                        <option value="293.66">D4</option>
+                        <option value="329.63">E4</option>
+                        <option value="349.23">F4</option>
+                        <option value="392.00">G4</option>
+                        <option value="440.00" selected>A4 (440Hz)</option>
+                        <option value="493.88">B4</option>
+                        <option value="523.25">C5</option>
+                    </select>
+                    <input type="range" id="pitchFine" min="-50" max="50" value="0" step="1">
+                    <span id="pitchDisplay">440.0 Hz</span>
+                </div>
+            </div>
         </section>
         <section id="multi-track">
             <h2>Multi-Track Display</h2>

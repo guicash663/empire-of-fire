@@ -9,6 +9,7 @@ A professional music recording studio application for Android devices with multi
   - Live audio monitoring (hear yourself as you record)
   - Real-time waveform visualization
   - Input level meter with color-coded feedback (green/orange/red)
+  - Interactive auto-tune pitch guide (drag to adjust target pitch)
 - **🎛️ Multi-Track Support**: Manage and mix multiple audio tracks
 - **✨ Audio Effects**: Apply professional effects including:
   - Reverb
