@@ -54,9 +54,23 @@ Without these permissions, the app won't be able to record or save your music.
 ### Recording Your First Track
 
 1. **Tap the 🔴 Record button** to start recording
-2. **Speak or play your instrument** near the device's microphone
-3. **Tap the ⏹️ Stop button** when you're done
-4. **Tap ▶️ Play** to hear your recording
+2. **Watch the live feedback** - you'll see:
+   - Real-time waveform visualization
+   - Input level meter (green = good, orange = hot, red = clipping)
+3. **Speak or play your instrument** near the device's microphone
+4. **Tap the ⏹️ Stop button** when you're done
+5. **Tap ▶️ Play** to hear your recording
+
+### Using Live Audio Monitoring
+
+Want to hear yourself while recording?
+
+1. **Check the "🔊 Enable Live Audio Monitoring" box** before recording
+2. **Plug in headphones** (recommended to avoid feedback)
+3. **Start recording** - you'll hear yourself in real-time
+4. **Adjust your performance** based on what you hear
+
+⚠️ **Warning**: Using live monitoring without headphones may cause audio feedback!
 
 ### Applying Effects
 

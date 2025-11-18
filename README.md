@@ -5,6 +5,10 @@ A professional music recording studio application for Android devices with multi
 ## 🎵 Features
 
 - **🎙️ Audio Recording**: Record high-quality audio using your device's microphone
+- **🔊 Live Feedback System**: Real-time monitoring while recording
+  - Live audio monitoring (hear yourself as you record)
+  - Real-time waveform visualization
+  - Input level meter with color-coded feedback (green/orange/red)
 - **🎛️ Multi-Track Support**: Manage and mix multiple audio tracks
 - **✨ Audio Effects**: Apply professional effects including:
   - Reverb
@@ -14,7 +18,7 @@ A professional music recording studio application for Android devices with multi
 - **🎸 Synthesizers**: Built-in synthesizers for:
   - Guitar sounds
   - Drum beats (Kick & Snare)
-- **📊 Waveform Visualizer**: Real-time audio visualization
+- **📊 Waveform Visualizer**: Real-time audio visualization during recording
 - **💾 File Management**: Import and export audio files
 - **📱 Mobile-Optimized**: Responsive design for Android devices
 

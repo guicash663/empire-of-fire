@@ -18,6 +18,19 @@
             <button id="stopBtn" class="button">⏹️ Stop</button>
             <button id="playBtn" class="button">▶️ Play</button>
         </section>
+        <section id="live-feedback">
+            <h2>🎙️ Live Feedback</h2>
+            <div id="levelMeter" class="level-meter">
+                <label>Input Level:</label>
+                <div class="level-meter-container">
+                    <div id="levelBar" class="level-bar"></div>
+                </div>
+            </div>
+            <label class="monitor-control">
+                <input type="checkbox" id="monitorToggle"> 
+                <span>🔊 Enable Live Audio Monitoring (hear yourself)</span>
+            </label>
+        </section>
         <section id="visualizer-section">
             <h2>Waveform Visualizer</h2>
             <canvas id="waveform" width="800" height="200"></canvas>
