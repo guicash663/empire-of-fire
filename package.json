@@ -1,0 +1,27 @@
+{
+  "name": "empire-of-fire",
+  "version": "1.0.0",
+  "description": "A web-based recording studio application with audio sample management, effects, and soundboard functionality",
+  "main": "app.js",
+  "scripts": {
+    "start": "http-server -p 3000 -c-1",
+    "dev": "http-server -p 3000 -c-1 -o"
+  },
+  "keywords": [
+    "audio",
+    "recording",
+    "studio",
+    "web-audio",
+    "soundboard",
+    "sample-editor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "http-server": "^14.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guicash663/empire-of-fire.git"
+  }
+}
