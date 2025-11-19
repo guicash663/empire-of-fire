@@ -4,12 +4,14 @@
 
 import SampleManager from './sample-manager.js';
 import AIDrumMachine from './ai-drum-machine.js';
+import LiveMonitor from './live-monitor.js';
 
 // Global state
 let audioContext;
 let sampleManager;
 let loadedAudioBuffer = null;
 let drumMachine;
+let liveMonitor;
 
 function init() {
     // Initialize audio context
@@ -21,11 +23,15 @@ function init() {
     // Initialize AI drum machine
     drumMachine = new AIDrumMachine(audioContext);
     
+    // Initialize live monitor
+    liveMonitor = new LiveMonitor(audioContext);
+    
     // Setup event listeners
     setupSongLoader();
     setupSampleEditor();
     setupSoundboard();
     setupDrumMachine();
+    setupLiveMonitor();
     
     console.log('Application initialized');
 }
@@ -397,6 +403,100 @@ function setupDrumMachine() {
 
     // Initial render
     renderSequencer();
+}
+
+// Live Monitor functionality (optimized for speed)
+function setupLiveMonitor() {
+    // Get DOM elements
+    const monitorToggle = document.getElementById('monitorToggle');
+    const autoTuneToggle = document.getElementById('autoTuneToggle');
+    const autoTuneStrength = document.getElementById('autoTuneStrength');
+    const autoTuneValue = document.getElementById('autoTuneValue');
+    const electricHumToggle = document.getElementById('electricHumToggle');
+    const humIntensity = document.getElementById('humIntensity');
+    const humValue = document.getElementById('humValue');
+    const humFrequency = document.getElementById('humFrequency');
+
+    // Monitor toggle button
+    monitorToggle.addEventListener('click', async () => {
+        if (!liveMonitor.isMonitoring()) {
+            try {
+                await liveMonitor.start();
+                monitorToggle.textContent = '🔴 Stop Monitoring';
+                monitorToggle.className = 'monitor-btn-on';
+                
+                // Enable controls
+                autoTuneStrength.disabled = !autoTuneToggle.checked;
+                humIntensity.disabled = !electricHumToggle.checked;
+                humFrequency.disabled = !electricHumToggle.checked;
+            } catch (error) {
+                alert('Failed to start monitoring. Please allow microphone access.');
+                console.error(error);
+            }
+        } else {
+            liveMonitor.stop();
+            monitorToggle.textContent = '🎤 Start Monitoring';
+            monitorToggle.className = 'monitor-btn-off';
+            
+            // Disable controls
+            autoTuneStrength.disabled = true;
+            humIntensity.disabled = true;
+            humFrequency.disabled = true;
+        }
+    });
+
+    // Auto-tune toggle
+    autoTuneToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            const strength = parseInt(autoTuneStrength.value) / 100;
+            liveMonitor.enableAutotune(strength);
+            autoTuneStrength.disabled = false;
+        } else {
+            liveMonitor.disableAutotune();
+            autoTuneStrength.disabled = true;
+        }
+    });
+
+    // Auto-tune strength
+    autoTuneStrength.addEventListener('input', (e) => {
+        const strength = parseInt(e.target.value) / 100;
+        autoTuneValue.textContent = e.target.value + '%';
+        liveMonitor.setAutotuneStrength(strength);
+    });
+
+    // Electric hum toggle
+    electricHumToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            const intensity = parseInt(humIntensity.value) / 1000; // Scale to 0.0-0.1
+            const frequency = parseInt(humFrequency.value);
+            liveMonitor.enableElectricHum(intensity, frequency);
+            humIntensity.disabled = false;
+            humFrequency.disabled = false;
+        } else {
+            liveMonitor.disableElectricHum();
+            humIntensity.disabled = true;
+            humFrequency.disabled = true;
+        }
+    });
+
+    // Hum intensity
+    humIntensity.addEventListener('input', (e) => {
+        const intensity = parseInt(e.target.value) / 1000; // Scale to 0.0-0.1
+        humValue.textContent = e.target.value + '%';
+        liveMonitor.setHumIntensity(intensity);
+    });
+
+    // Hum frequency
+    humFrequency.addEventListener('change', (e) => {
+        const intensity = parseInt(humIntensity.value) / 1000;
+        const frequency = parseInt(e.target.value);
+        
+        // Restart hum with new frequency
+        if (electricHumToggle.checked) {
+            liveMonitor.disableElectricHum();
+            liveMonitor.enableElectricHum(intensity, frequency);
+        }
+    });
 }
 
 // Run the application

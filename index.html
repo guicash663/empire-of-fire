@@ -64,11 +64,30 @@
             </select>
             <button id="applyEffectBtn">Apply Effect</button>
         </section>
-        <section id="auto-tune">
-            <h2>Auto-Tune Interface</h2>
-            <label>
-                <input type="checkbox" id="autoTuneToggle"> Enable Auto-Tune
-            </label>
+        <section id="live-monitor">
+            <h2>Live Monitor 🎧</h2>
+            <div class="monitor-controls">
+                <button id="monitorToggle" class="monitor-btn-off">🎤 Start Monitoring</button>
+                <div class="monitor-settings">
+                    <label class="monitor-label">
+                        <input type="checkbox" id="autoTuneToggle"> Fast Auto-Tune
+                        <input type="range" id="autoTuneStrength" min="0" max="100" value="30" step="1" disabled>
+                        <span id="autoTuneValue">30%</span>
+                    </label>
+                    <label class="monitor-label">
+                        <input type="checkbox" id="electricHumToggle"> Electric Hum
+                        <input type="range" id="humIntensity" min="0" max="100" value="20" step="1" disabled>
+                        <span id="humValue">20%</span>
+                    </label>
+                    <label class="monitor-label">
+                        Hum Frequency:
+                        <select id="humFrequency" disabled>
+                            <option value="60">60Hz (US)</option>
+                            <option value="50">50Hz (EU)</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
         </section>
         <section id="ai-drum-machine">
             <h2>AI Drum Machine</h2>

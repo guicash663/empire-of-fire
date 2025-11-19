@@ -355,3 +355,104 @@ section h2 {
 .sequencer-step.active.current {
     box-shadow: 0 0 15px rgba(102, 126, 234, 0.8);
 }
+
+/* Live Monitor Styles */
+#live-monitor {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid #333;
+}
+
+.monitor-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#monitorToggle {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+    width: fit-content;
+}
+
+.monitor-btn-off {
+    background: linear-gradient(135deg, #555 0%, #333 100%);
+    color: white;
+}
+
+.monitor-btn-on {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.8);
+    }
+}
+
+.monitor-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    background: #0a0a0a;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.monitor-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #E0E0E0;
+    font-size: 14px;
+}
+
+.monitor-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #1DB954;
+}
+
+.monitor-label input[type="range"] {
+    flex: 1;
+    max-width: 200px;
+    accent-color: #1DB954;
+}
+
+.monitor-label input[type="range"]:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.monitor-label select {
+    padding: 5px 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #222;
+    color: white;
+    font-size: 14px;
+}
+
+.monitor-label select:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.monitor-label span {
+    min-width: 45px;
+    font-weight: bold;
+    color: #1DB954;
+}

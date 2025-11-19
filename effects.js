@@ -165,6 +165,115 @@ class AudioEffects {
             output: this.masterGain
         };
     }
+
+    // Create fast, shallow autotune effect (optimized for minimal latency)
+    createFastAutotune(strength = 0.3) {
+        // Use a very tight pitch quantization for fast response
+        // This creates a subtle "T-Pain/Cher" vibe without heavy processing
+        
+        // Create a short delay for pitch shifting simulation
+        const pitchDelay = this.audioContext.createDelay(0.1);
+        pitchDelay.delayTime.value = 0.005; // 5ms delay for shallow effect
+        
+        // Create a feedback loop for the characteristic autotune sound
+        const feedback = this.audioContext.createGain();
+        feedback.gain.value = strength * 0.5; // Subtle feedback
+        
+        // Create wet/dry mix
+        const dryGain = this.audioContext.createGain();
+        const wetGain = this.audioContext.createGain();
+        dryGain.gain.value = 1 - strength;
+        wetGain.gain.value = strength;
+        
+        // Simple pitch quantization using waveshaper for fast processing
+        const shaper = this.audioContext.createWaveShaper();
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) {
+            const x = (i / 128) - 1;
+            // Quantize to semitones for autotune effect
+            curve[i] = Math.round(x * 6) / 6; // Quantize to 6 semitones
+        }
+        shaper.curve = curve;
+        shaper.oversample = 'none'; // No oversampling for speed
+        
+        // Connect nodes
+        pitchDelay.connect(shaper);
+        shaper.connect(feedback);
+        feedback.connect(pitchDelay);
+        shaper.connect(wetGain);
+        
+        return {
+            input: pitchDelay,
+            dryGain,
+            wetGain,
+            feedback,
+            shaper
+        };
+    }
+
+    // Create electric hum effect (60Hz or 50Hz mains hum for authenticity)
+    createElectricHum(frequency = 60, intensity = 0.02) {
+        // Create oscillator for base hum
+        const hum = this.audioContext.createOscillator();
+        hum.type = 'sine';
+        hum.frequency.value = frequency; // 60Hz for US, 50Hz for EU
+        
+        // Create harmonics for realistic electric hum
+        const harmonic2 = this.audioContext.createOscillator();
+        harmonic2.type = 'sine';
+        harmonic2.frequency.value = frequency * 2; // 120Hz
+        
+        const harmonic3 = this.audioContext.createOscillator();
+        harmonic3.type = 'sine';
+        harmonic3.frequency.value = frequency * 3; // 180Hz
+        
+        // Create gain nodes for mixing
+        const humGain = this.audioContext.createGain();
+        const harm2Gain = this.audioContext.createGain();
+        const harm3Gain = this.audioContext.createGain();
+        const masterHumGain = this.audioContext.createGain();
+        
+        // Set intensity levels
+        humGain.gain.value = intensity;
+        harm2Gain.gain.value = intensity * 0.3;
+        harm3Gain.gain.value = intensity * 0.1;
+        masterHumGain.gain.value = 1;
+        
+        // Connect oscillators
+        hum.connect(humGain);
+        harmonic2.connect(harm2Gain);
+        harmonic3.connect(harm3Gain);
+        
+        // Mix harmonics
+        humGain.connect(masterHumGain);
+        harm2Gain.connect(masterHumGain);
+        harm3Gain.connect(masterHumGain);
+        
+        // Start oscillators
+        hum.start();
+        harmonic2.start();
+        harmonic3.start();
+        
+        return {
+            hum,
+            harmonic2,
+            harmonic3,
+            humGain,
+            harm2Gain,
+            harm3Gain,
+            output: masterHumGain,
+            setIntensity: (value) => {
+                humGain.gain.setValueAtTime(value, this.audioContext.currentTime);
+                harm2Gain.gain.setValueAtTime(value * 0.3, this.audioContext.currentTime);
+                harm3Gain.gain.setValueAtTime(value * 0.1, this.audioContext.currentTime);
+            },
+            stop: () => {
+                hum.stop();
+                harmonic2.stop();
+                harmonic3.stop();
+            }
+        };
+    }
 }
 
 export default AudioEffects;
