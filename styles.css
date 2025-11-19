@@ -232,3 +232,126 @@ section h2 {
     margin-bottom: 15px;
     color: #1DB954;
 }
+
+/* AI Drum Machine Styles */
+#ai-drum-machine {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.drum-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.drum-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.drum-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.drum-btn:active {
+    transform: translateY(0);
+}
+
+#drumBPM, #drumStyle {
+    padding: 8px 12px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #222;
+    color: white;
+    font-size: 14px;
+}
+
+#drumComplexity, #drumSwing {
+    width: 200px;
+    accent-color: #1DB954;
+}
+
+.control-row label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #E0E0E0;
+}
+
+.control-row span {
+    min-width: 50px;
+    font-weight: bold;
+    color: #1DB954;
+}
+
+/* Drum Sequencer Grid */
+.drum-sequencer {
+    background: #000;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.sequencer-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sequencer-label {
+    min-width: 80px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #1DB954;
+    text-transform: uppercase;
+}
+
+.sequencer-steps {
+    display: flex;
+    gap: 4px;
+}
+
+.sequencer-step {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #1a1a1a;
+}
+
+.sequencer-step:hover {
+    border-color: #667eea;
+}
+
+.sequencer-step.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+}
+
+.sequencer-step.current {
+    box-shadow: 0 0 15px rgba(29, 185, 84, 0.8);
+    border-color: #1DB954;
+}
+
+.sequencer-step.active.current {
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.8);
+}

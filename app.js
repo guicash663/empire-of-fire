@@ -3,11 +3,13 @@
 // This file wires up the recording studio UI with the audio engine, visualizer, soundboard, and all recording controls.
 
 import SampleManager from './sample-manager.js';
+import AIDrumMachine from './ai-drum-machine.js';
 
 // Global state
 let audioContext;
 let sampleManager;
 let loadedAudioBuffer = null;
+let drumMachine;
 
 function init() {
     // Initialize audio context
@@ -16,10 +18,14 @@ function init() {
     // Initialize sample manager
     sampleManager = new SampleManager(audioContext);
     
+    // Initialize AI drum machine
+    drumMachine = new AIDrumMachine(audioContext);
+    
     // Setup event listeners
     setupSongLoader();
     setupSampleEditor();
     setupSoundboard();
+    setupDrumMachine();
     
     console.log('Application initialized');
 }
@@ -258,6 +264,139 @@ function drawWaveform(audioBuffer) {
     ctx.moveTo(0, amp);
     ctx.lineTo(width, amp);
     ctx.stroke();
+}
+
+// AI Drum Machine functionality
+function setupDrumMachine() {
+    // Get DOM elements
+    const playBtn = document.getElementById('drumPlayBtn');
+    const stopBtn = document.getElementById('drumStopBtn');
+    const regenerateBtn = document.getElementById('drumRegenerateBtn');
+    const clearBtn = document.getElementById('drumClearBtn');
+    const bpmInput = document.getElementById('drumBPM');
+    const bpmValue = document.getElementById('bpmValue');
+    const styleSelect = document.getElementById('drumStyle');
+    const complexityInput = document.getElementById('drumComplexity');
+    const complexityValue = document.getElementById('complexityValue');
+    const swingInput = document.getElementById('drumSwing');
+    const swingValue = document.getElementById('swingValue');
+    const sequencerContainer = document.getElementById('drumSequencer');
+
+    // Render the sequencer grid
+    function renderSequencer() {
+        const pattern = drumMachine.getPattern();
+        const instruments = ['kick', 'snare', 'hihat', 'openhat'];
+        const labels = ['Kick', 'Snare', 'Hi-Hat', 'Open Hat'];
+        
+        sequencerContainer.innerHTML = '';
+        
+        instruments.forEach((instrument, idx) => {
+            const row = document.createElement('div');
+            row.className = 'sequencer-row';
+            
+            const label = document.createElement('div');
+            label.className = 'sequencer-label';
+            label.textContent = labels[idx];
+            row.appendChild(label);
+            
+            const steps = document.createElement('div');
+            steps.className = 'sequencer-steps';
+            
+            for (let i = 0; i < 16; i++) {
+                const step = document.createElement('div');
+                step.className = 'sequencer-step';
+                step.dataset.instrument = instrument;
+                step.dataset.step = i;
+                
+                if (pattern[instrument][i]) {
+                    step.classList.add('active');
+                }
+                
+                step.addEventListener('click', () => {
+                    drumMachine.toggleStep(instrument, i);
+                    renderSequencer();
+                });
+                
+                steps.appendChild(step);
+            }
+            
+            row.appendChild(steps);
+            sequencerContainer.appendChild(row);
+        });
+    }
+
+    // Update current step indicator
+    drumMachine.onStepCallback = (step) => {
+        const allSteps = document.querySelectorAll('.sequencer-step');
+        allSteps.forEach((stepEl, index) => {
+            const stepNum = index % 16;
+            if (stepNum === step) {
+                stepEl.classList.add('current');
+            } else {
+                stepEl.classList.remove('current');
+            }
+        });
+    };
+
+    // Play button
+    playBtn.addEventListener('click', () => {
+        if (!drumMachine.getIsPlaying()) {
+            drumMachine.start();
+            playBtn.textContent = '⏸ Pause';
+        } else {
+            drumMachine.stop();
+            playBtn.textContent = '▶ Play';
+        }
+    });
+
+    // Stop button
+    stopBtn.addEventListener('click', () => {
+        drumMachine.stop();
+        playBtn.textContent = '▶ Play';
+    });
+
+    // Regenerate button
+    regenerateBtn.addEventListener('click', () => {
+        drumMachine.regenerate();
+        renderSequencer();
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+        drumMachine.clear();
+        renderSequencer();
+    });
+
+    // BPM control
+    bpmInput.addEventListener('input', (e) => {
+        const bpm = parseInt(e.target.value);
+        drumMachine.setBPM(bpm);
+        bpmValue.textContent = bpm;
+    });
+
+    // Style control
+    styleSelect.addEventListener('change', (e) => {
+        drumMachine.setStyle(e.target.value);
+        renderSequencer();
+    });
+
+    // Complexity control
+    complexityInput.addEventListener('input', (e) => {
+        const complexity = parseInt(e.target.value) / 100;
+        drumMachine.setComplexity(complexity);
+        complexityValue.textContent = e.target.value + '%';
+        renderSequencer();
+    });
+
+    // Swing control
+    swingInput.addEventListener('input', (e) => {
+        const swing = parseInt(e.target.value);
+        drumMachine.setSwing(swing);
+        swingValue.textContent = e.target.value + '%';
+    });
+
+    // Initial render
+    renderSequencer();
 }
 
 // Run the application

@@ -70,6 +70,49 @@
                 <input type="checkbox" id="autoTuneToggle"> Enable Auto-Tune
             </label>
         </section>
+        <section id="ai-drum-machine">
+            <h2>AI Drum Machine</h2>
+            <div class="drum-controls">
+                <div class="control-row">
+                    <button id="drumPlayBtn" class="drum-btn">▶ Play</button>
+                    <button id="drumStopBtn" class="drum-btn">■ Stop</button>
+                    <button id="drumRegenerateBtn" class="drum-btn">🔄 Regenerate</button>
+                    <button id="drumClearBtn" class="drum-btn">Clear</button>
+                </div>
+                <div class="control-row">
+                    <label>
+                        BPM: <input type="number" id="drumBPM" min="60" max="200" value="120" step="1">
+                        <span id="bpmValue">120</span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Style:
+                        <select id="drumStyle">
+                            <option value="rock">Rock</option>
+                            <option value="electronic">Electronic</option>
+                            <option value="jazz">Jazz</option>
+                            <option value="funk">Funk</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Complexity: <input type="range" id="drumComplexity" min="0" max="100" value="50" step="1">
+                        <span id="complexityValue">50%</span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Swing: <input type="range" id="drumSwing" min="0" max="100" value="0" step="1">
+                        <span id="swingValue">0%</span>
+                    </label>
+                </div>
+            </div>
+            <div id="drumSequencer" class="drum-sequencer">
+                <!-- Sequencer grid will be generated here -->
+            </div>
+        </section>
     </main>
     <footer>
         <p>&copy; 2025 Recording Studio</p>
