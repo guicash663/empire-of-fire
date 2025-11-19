@@ -9,17 +9,48 @@
    ```
    cd empire-of-fire
    ```
-3. Install required dependencies:
-   ```
-   npm install  # or yarn install
-   ```
 
-## Usage Guide
-- To start the application, run:
-  ```
-  npm start  # or yarn start
-  ```
-- Open your browser and go to `http://localhost:3000` to access the app.
+## Web Application
+The Empire of Fire recording studio can be run as a web application:
+
+1. Open `www/index.html` directly in a web browser, or
+2. Use a local web server:
+   ```
+   npx http-server www -p 8080
+   ```
+3. Access the app at `http://localhost:8080`
+
+## Cordova Mobile Application
+
+This project is configured as a Cordova application for building native mobile apps.
+
+### Prerequisites
+- Node.js and npm installed
+- Cordova CLI: `npm install -g cordova`
+- For Android builds:
+  - Java JDK 11 or higher
+  - Android SDK (Android Studio recommended)
+  - Gradle
+
+### Building for Android
+1. Install Cordova globally:
+   ```
+   npm install -g cordova
+   ```
+2. Add Android platform (if not already added):
+   ```
+   cordova platform add android
+   ```
+3. Build the Android APK:
+   ```
+   cordova build android
+   ```
+4. The APK will be generated in `platforms/android/app/build/outputs/apk/`
+
+### Running on Android Device/Emulator
+```
+cordova run android
+```
 
 ## Features Overview
 - **Feature 1**: Description of feature 1.
