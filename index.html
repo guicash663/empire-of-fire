@@ -64,11 +64,112 @@
             </select>
             <button id="applyEffectBtn">Apply Effect</button>
         </section>
-        <section id="auto-tune">
-            <h2>Auto-Tune Interface</h2>
-            <label>
-                <input type="checkbox" id="autoTuneToggle"> Enable Auto-Tune
-            </label>
+        <section id="live-monitor">
+            <h2>Live Monitor 🎧</h2>
+            <div class="monitor-controls">
+                <button id="monitorToggle" class="monitor-btn-off">🎤 Start Monitoring</button>
+                <div class="monitor-settings">
+                    <label class="monitor-label">
+                        <input type="checkbox" id="autoTuneToggle"> Fast Auto-Tune
+                        <input type="range" id="autoTuneStrength" min="0" max="100" value="30" step="1" disabled>
+                        <span id="autoTuneValue">30%</span>
+                    </label>
+                    <label class="monitor-label">
+                        <input type="checkbox" id="electricHumToggle"> Electric Hum
+                        <input type="range" id="humIntensity" min="0" max="100" value="20" step="1" disabled>
+                        <span id="humValue">20%</span>
+                    </label>
+                    <label class="monitor-label">
+                        Hum Frequency:
+                        <select id="humFrequency" disabled>
+                            <option value="60">60Hz (US)</option>
+                            <option value="50">50Hz (EU)</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+        </section>
+        <section id="ai-drum-machine">
+            <h2>AI Drum Machine</h2>
+            <div class="drum-controls">
+                <div class="control-row">
+                    <button id="drumPlayBtn" class="drum-btn">▶ Play</button>
+                    <button id="drumStopBtn" class="drum-btn">■ Stop</button>
+                    <button id="drumRegenerateBtn" class="drum-btn">🔄 Regenerate</button>
+                    <button id="drumClearBtn" class="drum-btn">Clear</button>
+                </div>
+                <div class="control-row">
+                    <label>
+                        BPM: <input type="number" id="drumBPM" min="60" max="200" value="120" step="1">
+                        <span id="bpmValue">120</span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Style:
+                        <select id="drumStyle">
+                            <option value="rock">Rock</option>
+                            <option value="electronic">Electronic</option>
+                            <option value="jazz">Jazz</option>
+                            <option value="funk">Funk</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Complexity: <input type="range" id="drumComplexity" min="0" max="100" value="50" step="1">
+                        <span id="complexityValue">50%</span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Swing: <input type="range" id="drumSwing" min="0" max="100" value="0" step="1">
+                        <span id="swingValue">0%</span>
+                    </label>
+                </div>
+            </div>
+            <div id="drumSequencer" class="drum-sequencer">
+                <!-- Sequencer grid will be generated here -->
+            </div>
+        </section>
+        <section id="chatbot-soundboard">
+            <h2>🤖 300-Key Chatbot Soundboard</h2>
+            <div class="chatbot-controls">
+                <div class="control-row">
+                    <button id="chatbotToggle" class="chatbot-btn">🤖 Start Chatbot</button>
+                    <button id="chatbotClear" class="chatbot-btn">Clear All</button>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Speed: <input type="range" id="chatbotSpeed" min="10" max="2000" value="100" step="10">
+                        <span id="chatbotSpeedValue">100ms</span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Pattern:
+                        <select id="chatbotPattern">
+                            <option value="random">Random</option>
+                            <option value="sequence">Sequence</option>
+                            <option value="rhythm">Rhythm</option>
+                            <option value="melody">Melody</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Volume: <input type="range" id="chatbotVolume" min="0" max="100" value="60" step="1">
+                        <span id="chatbotVolumeValue">60%</span>
+                    </label>
+                </div>
+            </div>
+            <div id="soundboardGrid" class="soundboard-300">
+                <!-- 300 keys will be generated here -->
+            </div>
+            <div class="soundboard-stats">
+                <span id="activeSounds">Active: 0</span>
+                <span id="totalKeys">Total Keys: 300</span>
+            </div>
         </section>
     </main>
     <footer>

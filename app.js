@@ -3,11 +3,17 @@
 // This file wires up the recording studio UI with the audio engine, visualizer, soundboard, and all recording controls.
 
 import SampleManager from './sample-manager.js';
+import AIDrumMachine from './ai-drum-machine.js';
+import LiveMonitor from './live-monitor.js';
+import ChatbotSoundboard from './chatbot-soundboard.js';
 
 // Global state
 let audioContext;
 let sampleManager;
 let loadedAudioBuffer = null;
+let drumMachine;
+let liveMonitor;
+let chatbotSoundboard;
 
 function init() {
     // Initialize audio context
@@ -16,10 +22,22 @@ function init() {
     // Initialize sample manager
     sampleManager = new SampleManager(audioContext);
     
+    // Initialize AI drum machine
+    drumMachine = new AIDrumMachine(audioContext);
+    
+    // Initialize live monitor
+    liveMonitor = new LiveMonitor(audioContext);
+    
+    // Initialize chatbot soundboard
+    chatbotSoundboard = new ChatbotSoundboard(audioContext);
+    
     // Setup event listeners
     setupSongLoader();
     setupSampleEditor();
     setupSoundboard();
+    setupDrumMachine();
+    setupLiveMonitor();
+    setupChatbotSoundboard();
     
     console.log('Application initialized');
 }
@@ -80,11 +98,8 @@ function setupSampleEditor() {
         
         try {
             const sample = sampleManager.extractSample(startTime, endTime, 'Preview');
-            // Play preview immediately
-            const source = audioContext.createBufferSource();
-            source.buffer = sample.buffer;
-            source.connect(audioContext.destination);
-            source.start(0);
+            // Use optimized quick play for instant preview with minimal latency
+            sampleManager.quickPlay(sample.buffer);
         } catch (error) {
             alert('Error previewing sample: ' + error.message);
             console.error(error);
@@ -205,7 +220,7 @@ function createSoundboardPad(sample) {
     return pad;
 }
 
-// Draw waveform visualization
+// Draw waveform visualization (optimized for performance)
 function drawWaveform(audioBuffer) {
     const canvas = document.getElementById('waveformCanvas');
     const ctx = canvas.getContext('2d');
@@ -221,19 +236,38 @@ function drawWaveform(audioBuffer) {
     const step = Math.ceil(data.length / width);
     const amp = height / 2;
     
-    // Draw waveform
+    // Use optimized rendering with path2D for better performance
     ctx.strokeStyle = '#1DB954';
     ctx.lineWidth = 1;
-    ctx.beginPath();
     
+    // Pre-calculate min/max values for better performance
+    const peaks = new Float32Array(width * 2);
     for (let i = 0; i < width; i++) {
-        const min = Math.min(...data.slice(i * step, (i + 1) * step));
-        const max = Math.max(...data.slice(i * step, (i + 1) * step));
+        const start = i * step;
+        const end = Math.min(start + step, data.length);
+        let min = 1.0;
+        let max = -1.0;
+        
+        // Find min and max in this segment
+        for (let j = start; j < end; j++) {
+            const value = data[j];
+            if (value < min) min = value;
+            if (value > max) max = value;
+        }
+        
+        peaks[i * 2] = min;
+        peaks[i * 2 + 1] = max;
+    }
+    
+    // Draw waveform using optimized path
+    ctx.beginPath();
+    for (let i = 0; i < width; i++) {
+        const min = peaks[i * 2];
+        const max = peaks[i * 2 + 1];
         
         ctx.moveTo(i, (1 + min) * amp);
         ctx.lineTo(i, (1 + max) * amp);
     }
-    
     ctx.stroke();
     
     // Draw center line
@@ -242,6 +276,328 @@ function drawWaveform(audioBuffer) {
     ctx.moveTo(0, amp);
     ctx.lineTo(width, amp);
     ctx.stroke();
+}
+
+// AI Drum Machine functionality
+function setupDrumMachine() {
+    // Get DOM elements
+    const playBtn = document.getElementById('drumPlayBtn');
+    const stopBtn = document.getElementById('drumStopBtn');
+    const regenerateBtn = document.getElementById('drumRegenerateBtn');
+    const clearBtn = document.getElementById('drumClearBtn');
+    const bpmInput = document.getElementById('drumBPM');
+    const bpmValue = document.getElementById('bpmValue');
+    const styleSelect = document.getElementById('drumStyle');
+    const complexityInput = document.getElementById('drumComplexity');
+    const complexityValue = document.getElementById('complexityValue');
+    const swingInput = document.getElementById('drumSwing');
+    const swingValue = document.getElementById('swingValue');
+    const sequencerContainer = document.getElementById('drumSequencer');
+
+    // Render the sequencer grid
+    function renderSequencer() {
+        const pattern = drumMachine.getPattern();
+        const instruments = ['kick', 'snare', 'hihat', 'openhat'];
+        const labels = ['Kick', 'Snare', 'Hi-Hat', 'Open Hat'];
+        
+        sequencerContainer.innerHTML = '';
+        
+        instruments.forEach((instrument, idx) => {
+            const row = document.createElement('div');
+            row.className = 'sequencer-row';
+            
+            const label = document.createElement('div');
+            label.className = 'sequencer-label';
+            label.textContent = labels[idx];
+            row.appendChild(label);
+            
+            const steps = document.createElement('div');
+            steps.className = 'sequencer-steps';
+            
+            for (let i = 0; i < 16; i++) {
+                const step = document.createElement('div');
+                step.className = 'sequencer-step';
+                step.dataset.instrument = instrument;
+                step.dataset.step = i;
+                
+                if (pattern[instrument][i]) {
+                    step.classList.add('active');
+                }
+                
+                step.addEventListener('click', () => {
+                    drumMachine.toggleStep(instrument, i);
+                    renderSequencer();
+                });
+                
+                steps.appendChild(step);
+            }
+            
+            row.appendChild(steps);
+            sequencerContainer.appendChild(row);
+        });
+    }
+
+    // Update current step indicator
+    drumMachine.onStepCallback = (step) => {
+        const allSteps = document.querySelectorAll('.sequencer-step');
+        allSteps.forEach((stepEl, index) => {
+            const stepNum = index % 16;
+            if (stepNum === step) {
+                stepEl.classList.add('current');
+            } else {
+                stepEl.classList.remove('current');
+            }
+        });
+    };
+
+    // Play button
+    playBtn.addEventListener('click', () => {
+        if (!drumMachine.getIsPlaying()) {
+            drumMachine.start();
+            playBtn.textContent = '⏸ Pause';
+        } else {
+            drumMachine.stop();
+            playBtn.textContent = '▶ Play';
+        }
+    });
+
+    // Stop button
+    stopBtn.addEventListener('click', () => {
+        drumMachine.stop();
+        playBtn.textContent = '▶ Play';
+    });
+
+    // Regenerate button
+    regenerateBtn.addEventListener('click', () => {
+        drumMachine.regenerate();
+        renderSequencer();
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+        drumMachine.clear();
+        renderSequencer();
+    });
+
+    // BPM control
+    bpmInput.addEventListener('input', (e) => {
+        const bpm = parseInt(e.target.value);
+        drumMachine.setBPM(bpm);
+        bpmValue.textContent = bpm;
+    });
+
+    // Style control
+    styleSelect.addEventListener('change', (e) => {
+        drumMachine.setStyle(e.target.value);
+        renderSequencer();
+    });
+
+    // Complexity control
+    complexityInput.addEventListener('input', (e) => {
+        const complexity = parseInt(e.target.value) / 100;
+        drumMachine.setComplexity(complexity);
+        complexityValue.textContent = e.target.value + '%';
+        renderSequencer();
+    });
+
+    // Swing control
+    swingInput.addEventListener('input', (e) => {
+        const swing = parseInt(e.target.value);
+        drumMachine.setSwing(swing);
+        swingValue.textContent = e.target.value + '%';
+    });
+
+    // Initial render
+    renderSequencer();
+}
+
+// Live Monitor functionality (optimized for speed)
+function setupLiveMonitor() {
+    // Get DOM elements
+    const monitorToggle = document.getElementById('monitorToggle');
+    const autoTuneToggle = document.getElementById('autoTuneToggle');
+    const autoTuneStrength = document.getElementById('autoTuneStrength');
+    const autoTuneValue = document.getElementById('autoTuneValue');
+    const electricHumToggle = document.getElementById('electricHumToggle');
+    const humIntensity = document.getElementById('humIntensity');
+    const humValue = document.getElementById('humValue');
+    const humFrequency = document.getElementById('humFrequency');
+
+    // Monitor toggle button
+    monitorToggle.addEventListener('click', async () => {
+        if (!liveMonitor.isMonitoring()) {
+            try {
+                await liveMonitor.start();
+                monitorToggle.textContent = '🔴 Stop Monitoring';
+                monitorToggle.className = 'monitor-btn-on';
+                
+                // Enable controls
+                autoTuneStrength.disabled = !autoTuneToggle.checked;
+                humIntensity.disabled = !electricHumToggle.checked;
+                humFrequency.disabled = !electricHumToggle.checked;
+            } catch (error) {
+                alert('Failed to start monitoring. Please allow microphone access.');
+                console.error(error);
+            }
+        } else {
+            liveMonitor.stop();
+            monitorToggle.textContent = '🎤 Start Monitoring';
+            monitorToggle.className = 'monitor-btn-off';
+            
+            // Disable controls
+            autoTuneStrength.disabled = true;
+            humIntensity.disabled = true;
+            humFrequency.disabled = true;
+        }
+    });
+
+    // Auto-tune toggle
+    autoTuneToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            const strength = parseInt(autoTuneStrength.value) / 100;
+            liveMonitor.enableAutotune(strength);
+            autoTuneStrength.disabled = false;
+        } else {
+            liveMonitor.disableAutotune();
+            autoTuneStrength.disabled = true;
+        }
+    });
+
+    // Auto-tune strength
+    autoTuneStrength.addEventListener('input', (e) => {
+        const strength = parseInt(e.target.value) / 100;
+        autoTuneValue.textContent = e.target.value + '%';
+        liveMonitor.setAutotuneStrength(strength);
+    });
+
+    // Electric hum toggle
+    electricHumToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            const intensity = parseInt(humIntensity.value) / 1000; // Scale to 0.0-0.1
+            const frequency = parseInt(humFrequency.value);
+            liveMonitor.enableElectricHum(intensity, frequency);
+            humIntensity.disabled = false;
+            humFrequency.disabled = false;
+        } else {
+            liveMonitor.disableElectricHum();
+            humIntensity.disabled = true;
+            humFrequency.disabled = true;
+        }
+    });
+
+    // Hum intensity
+    humIntensity.addEventListener('input', (e) => {
+        const intensity = parseInt(e.target.value) / 1000; // Scale to 0.0-0.1
+        humValue.textContent = e.target.value + '%';
+        liveMonitor.setHumIntensity(intensity);
+    });
+
+    // Hum frequency
+    humFrequency.addEventListener('change', (e) => {
+        const intensity = parseInt(humIntensity.value) / 1000;
+        const frequency = parseInt(e.target.value);
+        
+        // Restart hum with new frequency
+        if (electricHumToggle.checked) {
+            liveMonitor.disableElectricHum();
+            liveMonitor.enableElectricHum(intensity, frequency);
+        }
+    });
+}
+
+// 300-Key Chatbot Soundboard functionality
+function setupChatbotSoundboard() {
+    // Get DOM elements
+    const chatbotToggle = document.getElementById('chatbotToggle');
+    const chatbotClear = document.getElementById('chatbotClear');
+    const chatbotSpeed = document.getElementById('chatbotSpeed');
+    const chatbotSpeedValue = document.getElementById('chatbotSpeedValue');
+    const chatbotPattern = document.getElementById('chatbotPattern');
+    const chatbotVolume = document.getElementById('chatbotVolume');
+    const chatbotVolumeValue = document.getElementById('chatbotVolumeValue');
+    const soundboardGrid = document.getElementById('soundboardGrid');
+    const activeSounds = document.getElementById('activeSounds');
+    
+    // Render the 300 keys
+    function renderSoundboard() {
+        soundboardGrid.innerHTML = '';
+        const keys = chatbotSoundboard.getAllKeys();
+        
+        keys.forEach((key, index) => {
+            const keyElement = document.createElement('div');
+            keyElement.className = 'soundboard-key';
+            keyElement.style.backgroundColor = key.color;
+            keyElement.dataset.keyIndex = index;
+            keyElement.title = `Key ${index}: ${key.soundType} (${key.frequency.toFixed(0)}Hz)`;
+            
+            // Manual trigger on click
+            keyElement.addEventListener('click', () => {
+                chatbotSoundboard.playKey(index);
+            });
+            
+            soundboardGrid.appendChild(keyElement);
+        });
+    }
+    
+    // Update key visual state
+    chatbotSoundboard.onKeyStateChange = (keyIndex, isActive) => {
+        const keyElement = soundboardGrid.querySelector(`[data-key-index="${keyIndex}"]`);
+        if (keyElement) {
+            if (isActive) {
+                keyElement.classList.add('active');
+            } else {
+                keyElement.classList.remove('active');
+            }
+        }
+        
+        // Update stats
+        const activeCount = chatbotSoundboard.getActiveKeys().length;
+        activeSounds.textContent = `Active: ${activeCount}`;
+    };
+    
+    // Chatbot toggle
+    chatbotToggle.addEventListener('click', () => {
+        const status = chatbotSoundboard.getChatbotStatus();
+        if (!status.enabled) {
+            chatbotSoundboard.startChatbot();
+            chatbotToggle.textContent = '⏸ Stop Chatbot';
+            chatbotToggle.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+        } else {
+            chatbotSoundboard.stopChatbot();
+            chatbotToggle.textContent = '🤖 Start Chatbot';
+            chatbotToggle.style.background = 'linear-gradient(135deg, #1DB954 0%, #169c46 100%)';
+        }
+    });
+    
+    // Clear button
+    chatbotClear.addEventListener('click', () => {
+        chatbotSoundboard.clearActiveKeys();
+        const keys = soundboardGrid.querySelectorAll('.soundboard-key');
+        keys.forEach(key => key.classList.remove('active'));
+        activeSounds.textContent = 'Active: 0';
+    });
+    
+    // Speed control
+    chatbotSpeed.addEventListener('input', (e) => {
+        const speed = parseInt(e.target.value);
+        chatbotSoundboard.setChatbotSpeed(speed);
+        chatbotSpeedValue.textContent = speed + 'ms';
+    });
+    
+    // Pattern control
+    chatbotPattern.addEventListener('change', (e) => {
+        chatbotSoundboard.setChatbotPattern(e.target.value);
+    });
+    
+    // Volume control
+    chatbotVolume.addEventListener('input', (e) => {
+        const volume = parseInt(e.target.value) / 100;
+        chatbotSoundboard.setVolume(volume);
+        chatbotVolumeValue.textContent = e.target.value + '%';
+    });
+    
+    // Initial render
+    renderSoundboard();
 }
 
 // Run the application
