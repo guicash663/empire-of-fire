@@ -5,6 +5,7 @@
 import SampleManager from './sample-manager.js';
 import AIDrumMachine from './ai-drum-machine.js';
 import LiveMonitor from './live-monitor.js';
+import ChatbotSoundboard from './chatbot-soundboard.js';
 
 // Global state
 let audioContext;
@@ -12,6 +13,7 @@ let sampleManager;
 let loadedAudioBuffer = null;
 let drumMachine;
 let liveMonitor;
+let chatbotSoundboard;
 
 function init() {
     // Initialize audio context
@@ -26,12 +28,16 @@ function init() {
     // Initialize live monitor
     liveMonitor = new LiveMonitor(audioContext);
     
+    // Initialize chatbot soundboard
+    chatbotSoundboard = new ChatbotSoundboard(audioContext);
+    
     // Setup event listeners
     setupSongLoader();
     setupSampleEditor();
     setupSoundboard();
     setupDrumMachine();
     setupLiveMonitor();
+    setupChatbotSoundboard();
     
     console.log('Application initialized');
 }
@@ -497,6 +503,101 @@ function setupLiveMonitor() {
             liveMonitor.enableElectricHum(intensity, frequency);
         }
     });
+}
+
+// 300-Key Chatbot Soundboard functionality
+function setupChatbotSoundboard() {
+    // Get DOM elements
+    const chatbotToggle = document.getElementById('chatbotToggle');
+    const chatbotClear = document.getElementById('chatbotClear');
+    const chatbotSpeed = document.getElementById('chatbotSpeed');
+    const chatbotSpeedValue = document.getElementById('chatbotSpeedValue');
+    const chatbotPattern = document.getElementById('chatbotPattern');
+    const chatbotVolume = document.getElementById('chatbotVolume');
+    const chatbotVolumeValue = document.getElementById('chatbotVolumeValue');
+    const soundboardGrid = document.getElementById('soundboardGrid');
+    const activeSounds = document.getElementById('activeSounds');
+    
+    // Render the 300 keys
+    function renderSoundboard() {
+        soundboardGrid.innerHTML = '';
+        const keys = chatbotSoundboard.getAllKeys();
+        
+        keys.forEach((key, index) => {
+            const keyElement = document.createElement('div');
+            keyElement.className = 'soundboard-key';
+            keyElement.style.backgroundColor = key.color;
+            keyElement.dataset.keyIndex = index;
+            keyElement.title = `Key ${index}: ${key.soundType} (${key.frequency.toFixed(0)}Hz)`;
+            
+            // Manual trigger on click
+            keyElement.addEventListener('click', () => {
+                chatbotSoundboard.playKey(index);
+            });
+            
+            soundboardGrid.appendChild(keyElement);
+        });
+    }
+    
+    // Update key visual state
+    chatbotSoundboard.onKeyStateChange = (keyIndex, isActive) => {
+        const keyElement = soundboardGrid.querySelector(`[data-key-index="${keyIndex}"]`);
+        if (keyElement) {
+            if (isActive) {
+                keyElement.classList.add('active');
+            } else {
+                keyElement.classList.remove('active');
+            }
+        }
+        
+        // Update stats
+        const activeCount = chatbotSoundboard.getActiveKeys().length;
+        activeSounds.textContent = `Active: ${activeCount}`;
+    };
+    
+    // Chatbot toggle
+    chatbotToggle.addEventListener('click', () => {
+        const status = chatbotSoundboard.getChatbotStatus();
+        if (!status.enabled) {
+            chatbotSoundboard.startChatbot();
+            chatbotToggle.textContent = '⏸ Stop Chatbot';
+            chatbotToggle.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+        } else {
+            chatbotSoundboard.stopChatbot();
+            chatbotToggle.textContent = '🤖 Start Chatbot';
+            chatbotToggle.style.background = 'linear-gradient(135deg, #1DB954 0%, #169c46 100%)';
+        }
+    });
+    
+    // Clear button
+    chatbotClear.addEventListener('click', () => {
+        chatbotSoundboard.clearActiveKeys();
+        const keys = soundboardGrid.querySelectorAll('.soundboard-key');
+        keys.forEach(key => key.classList.remove('active'));
+        activeSounds.textContent = 'Active: 0';
+    });
+    
+    // Speed control
+    chatbotSpeed.addEventListener('input', (e) => {
+        const speed = parseInt(e.target.value);
+        chatbotSoundboard.setChatbotSpeed(speed);
+        chatbotSpeedValue.textContent = speed + 'ms';
+    });
+    
+    // Pattern control
+    chatbotPattern.addEventListener('change', (e) => {
+        chatbotSoundboard.setChatbotPattern(e.target.value);
+    });
+    
+    // Volume control
+    chatbotVolume.addEventListener('input', (e) => {
+        const volume = parseInt(e.target.value) / 100;
+        chatbotSoundboard.setVolume(volume);
+        chatbotVolumeValue.textContent = e.target.value + '%';
+    });
+    
+    // Initial render
+    renderSoundboard();
 }
 
 // Run the application

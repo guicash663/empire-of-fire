@@ -132,6 +132,45 @@
                 <!-- Sequencer grid will be generated here -->
             </div>
         </section>
+        <section id="chatbot-soundboard">
+            <h2>🤖 300-Key Chatbot Soundboard</h2>
+            <div class="chatbot-controls">
+                <div class="control-row">
+                    <button id="chatbotToggle" class="chatbot-btn">🤖 Start Chatbot</button>
+                    <button id="chatbotClear" class="chatbot-btn">Clear All</button>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Speed: <input type="range" id="chatbotSpeed" min="10" max="2000" value="100" step="10">
+                        <span id="chatbotSpeedValue">100ms</span>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Pattern:
+                        <select id="chatbotPattern">
+                            <option value="random">Random</option>
+                            <option value="sequence">Sequence</option>
+                            <option value="rhythm">Rhythm</option>
+                            <option value="melody">Melody</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="control-row">
+                    <label>
+                        Volume: <input type="range" id="chatbotVolume" min="0" max="100" value="60" step="1">
+                        <span id="chatbotVolumeValue">60%</span>
+                    </label>
+                </div>
+            </div>
+            <div id="soundboardGrid" class="soundboard-300">
+                <!-- 300 keys will be generated here -->
+            </div>
+            <div class="soundboard-stats">
+                <span id="activeSounds">Active: 0</span>
+                <span id="totalKeys">Total Keys: 300</span>
+            </div>
+        </section>
     </main>
     <footer>
         <p>&copy; 2025 Recording Studio</p>
