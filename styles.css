@@ -24,8 +24,14 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 10px 20px;
     border-bottom: 1px solid #333;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+header h1 {
+    color: #1DB954;
+    font-size: 1.8rem;
 }
 
 /* Control Styles */
@@ -36,11 +42,15 @@ header {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.1s;
 }
 
 .button:hover {
     background-color: #1AA34A; /* Darker green on hover */
+}
+
+.button:active {
+    transform: scale(0.95);
 }
 
 /* Responsive grid layout for controls */
@@ -53,7 +63,8 @@ header {
 
 /* Input styles */
 input[type="text"],
-input[type="range"] {
+input[type="range"],
+input[type="number"] {
     background-color: #333;
     color: #E0E0E0;
     border: 1px solid #555;
@@ -62,8 +73,10 @@ input[type="range"] {
 }
 
 input[type="text"]:focus,
-input[type="range"]:focus {
+input[type="range"]:focus,
+input[type="number"]:focus {
     border-color: #1DB954;
+    outline: none;
 }
 
 /* Footer Styles */
@@ -71,6 +84,7 @@ footer {
     text-align: center;
     padding: 20px 0;
     border-top: 1px solid #333;
+    background: #1a1a1a;
 }
 
 /* Soundboard Styles */
@@ -87,8 +101,9 @@ footer {
     border-radius: 10px;
     padding: 20px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s ease;
     position: relative;
+    user-select: none;
 }
 
 .soundboard-pad:hover {
@@ -96,8 +111,10 @@ footer {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
 }
 
-.soundboard-pad:active {
+.soundboard-pad:active,
+.soundboard-pad.active {
     transform: scale(0.95);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
 }
 
 .soundboard-pad h3 {
@@ -136,6 +153,7 @@ footer {
     cursor: pointer;
     font-size: 10px;
     margin-top: 5px;
+    transition: all 0.15s ease;
 }
 
 .soundboard-pad .play-btn {
@@ -143,9 +161,17 @@ footer {
     color: white;
 }
 
+.soundboard-pad .play-btn:hover {
+    background-color: #1ed760;
+}
+
 .soundboard-pad .remove-btn {
     background-color: #e74c3c;
     color: white;
+}
+
+.soundboard-pad .remove-btn:hover {
+    background-color: #ff5252;
 }
 
 /* Sample Editor Styles */
@@ -197,11 +223,15 @@ footer {
     cursor: pointer;
     background-color: #1DB954;
     color: white;
-    transition: background-color 0.3s;
+    transition: all 0.15s ease;
 }
 
 .sample-controls button:hover {
     background-color: #1AA34A;
+}
+
+.sample-controls button:active {
+    transform: scale(0.95);
 }
 
 /* Song Loader Styles */
@@ -231,4 +261,335 @@ section {
 section h2 {
     margin-bottom: 15px;
     color: #1DB954;
+}
+
+/* Virtual Instruments Section */
+#instruments {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.instruments-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.instrument-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 20px;
+    border: 1px solid #333;
+}
+
+.instrument-section h3 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+/* Guitar Controls */
+.guitar-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.chord-buttons,
+.note-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.chord-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 14px;
+}
+
+.chord-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+}
+
+.chord-btn:active,
+.chord-btn.active {
+    transform: scale(0.95);
+    box-shadow: 0 0 20px rgba(240, 147, 251, 0.6);
+}
+
+.note-btn {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 12px;
+}
+
+.note-btn:hover {
+    transform: scale(1.05);
+}
+
+.note-btn:active,
+.note-btn.active {
+    transform: scale(0.95);
+    box-shadow: 0 0 15px rgba(79, 172, 254, 0.6);
+}
+
+.guitar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.guitar-actions button {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.guitar-actions button:hover {
+    transform: scale(1.05);
+}
+
+.guitar-actions button:active {
+    transform: scale(0.95);
+}
+
+/* Drum Pads */
+.drum-pads {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.drum-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 15px 10px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.drum-btn:active,
+.drum-btn.active {
+    transform: scale(0.9);
+}
+
+.drum-btn.kick {
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+}
+
+.drum-btn.snare {
+    background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+}
+
+.drum-btn.hihat {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+}
+
+.drum-btn.openhat {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.drum-btn.tom-high {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.drum-btn.tom-mid {
+    background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 100%);
+}
+
+.drum-btn.tom-low {
+    background: linear-gradient(135deg, #654ea3 0%, #eaafc8 100%);
+}
+
+.drum-btn.crash {
+    background: linear-gradient(135deg, #f953c6 0%, #b91d73 100%);
+}
+
+.drum-btn.ride {
+    background: linear-gradient(135deg, #c471ed 0%, #f64f59 100%);
+}
+
+.drum-btn.clap {
+    background: linear-gradient(135deg, #ed4264 0%, #ffedbc 100%);
+    color: #333;
+}
+
+.drum-btn.rimshot {
+    background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+}
+
+.drum-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.drum-actions button {
+    background: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.drum-actions button:hover {
+    transform: scale(1.05);
+}
+
+.drum-actions button:active {
+    transform: scale(0.95);
+}
+
+.drum-actions label {
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.drum-actions input[type="number"] {
+    width: 70px;
+    padding: 8px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: white;
+}
+
+/* Effects Controls */
+.effects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.effect-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.effect-panel select {
+    padding: 10px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: #E0E0E0;
+    cursor: pointer;
+}
+
+.effect-params {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.effect-params label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #ccc;
+}
+
+.effect-params input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Main buttons styling */
+#controls button,
+#file-controls button,
+#sample-loader button {
+    background-color: #1DB954;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-right: 10px;
+}
+
+#controls button:hover,
+#file-controls button:hover,
+#sample-loader button:hover {
+    background-color: #1ed760;
+    transform: scale(1.02);
+}
+
+#controls button:active,
+#file-controls button:active,
+#sample-loader button:active {
+    transform: scale(0.98);
+}
+
+/* File input styling */
+input[type="file"] {
+    background: #333;
+    color: #E0E0E0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    margin-right: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.4rem;
+    }
+    
+    .instruments-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .drum-pads {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .chord-buttons,
+    .note-buttons {
+        justify-content: center;
+    }
+}
+
+/* Touch-friendly adjustments */
+@media (pointer: coarse) {
+    .chord-btn,
+    .note-btn,
+    .drum-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .soundboard-pad {
+        min-height: 100px;
+    }
 }
