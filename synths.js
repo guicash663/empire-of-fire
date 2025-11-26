@@ -1,6 +1,10 @@
 // synths.js
 // Guitar and Drum Synthesis Modules - Enhanced with realistic sounds
 
+// Constants
+const SEMITONES_PER_OCTAVE = 12;
+const DEFAULT_NOISE_BUFFER_DURATION = 2; // seconds
+
 // Guitar Note Frequencies (Standard Tuning)
 const GUITAR_NOTES = {
     E2: 82.41, A2: 110.00, D3: 146.83, G3: 196.00, B3: 246.94, E4: 329.63,
@@ -191,7 +195,7 @@ class GuitarSynth {
         
         source.buffer = this.createPluckedString(frequency, duration + 0.5, 0.7);
         source.playbackRate.setValueAtTime(1, now);
-        source.playbackRate.linearRampToValueAtTime(Math.pow(2, bendAmount / 12), now + duration * 0.5);
+        source.playbackRate.linearRampToValueAtTime(Math.pow(2, bendAmount / SEMITONES_PER_OCTAVE), now + duration * 0.5);
         
         gainNode.gain.setValueAtTime(0.7, now);
         gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
@@ -224,7 +228,7 @@ class DrumSynth {
         this.masterGain.connect(this.audioContext.destination);
         
         // Pre-generate noise buffer for efficiency
-        this.noiseBuffer = this.createNoiseBuffer(2);
+        this.noiseBuffer = this.createNoiseBuffer(DEFAULT_NOISE_BUFFER_DURATION);
     }
 
     // Set shared audio context
@@ -233,7 +237,7 @@ class DrumSynth {
         this.masterGain = ctx.createGain();
         this.masterGain.gain.value = 0.8;
         this.masterGain.connect(ctx.destination);
-        this.noiseBuffer = this.createNoiseBuffer(2);
+        this.noiseBuffer = this.createNoiseBuffer(DEFAULT_NOISE_BUFFER_DURATION);
     }
 
     // Create a reusable noise buffer

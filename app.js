@@ -413,9 +413,20 @@ function drawWaveform(audioBuffer) {
     ctx.lineWidth = 1;
     ctx.beginPath();
     
+    // Handle empty audio buffer
+    if (data.length === 0) {
+        return;
+    }
+    
     for (let i = 0; i < width; i++) {
         const start = i * step;
         const end = Math.min(start + step, data.length);
+        
+        // Skip if start is beyond data length
+        if (start >= data.length) {
+            break;
+        }
+        
         let min = data[start];
         let max = data[start];
         

@@ -434,6 +434,9 @@ class AudioEffects {
     }
 
     // Apply an effect to a buffer and return processed buffer
+    // Note: A new AudioEffects instance is required here because Web Audio nodes
+    // cannot be shared between different AudioContext instances. OfflineAudioContext
+    // is used for non-real-time rendering.
     async processBuffer(inputBuffer, effectName, params = {}) {
         const offlineContext = new OfflineAudioContext(
             inputBuffer.numberOfChannels,
@@ -444,9 +447,8 @@ class AudioEffects {
         const source = offlineContext.createBufferSource();
         source.buffer = inputBuffer;
         
-        // Create effect in offline context
-        const effects = new AudioEffects(offlineContext);
-        const effect = effects[effectName];
+        // Create effect factory function to avoid full AudioEffects instantiation
+        const effect = this.createSingleEffect(offlineContext, effectName);
         
         if (!effect) {
             console.error('Unknown effect:', effectName);
@@ -465,6 +467,45 @@ class AudioEffects {
         
         source.start(0);
         return await offlineContext.startRendering();
+    }
+
+    // Create a single effect for offline processing (more efficient than full AudioEffects instance)
+    createSingleEffect(context, effectName) {
+        // Store original context and temporarily swap
+        const originalContext = this.audioContext;
+        this.audioContext = context;
+        
+        let effect = null;
+        switch (effectName) {
+            case 'reverb':
+                effect = this.createReverb();
+                break;
+            case 'echo':
+                effect = this.createEcho();
+                break;
+            case 'compressor':
+                effect = this.createCompressor();
+                break;
+            case 'eq':
+                effect = this.createEQ();
+                break;
+            case 'distortion':
+                effect = this.createDistortion();
+                break;
+            case 'chorus':
+                effect = this.createChorus();
+                break;
+            case 'tremolo':
+                effect = this.createTremolo();
+                break;
+            case 'phaser':
+                effect = this.createPhaser();
+                break;
+        }
+        
+        // Restore original context
+        this.audioContext = originalContext;
+        return effect;
     }
 }
 
