@@ -4,6 +4,8 @@
 // Constants
 const SEMITONES_PER_OCTAVE = 12;
 const DEFAULT_NOISE_BUFFER_DURATION = 2; // seconds
+const DEFAULT_DAMPING = 0.996; // Controls decay rate for Karplus-Strong
+const DEFAULT_BRIGHTNESS = 0.5; // Controls tone brightness for Karplus-Strong
 
 // Guitar Note Frequencies (Standard Tuning)
 const GUITAR_NOTES = {
@@ -28,6 +30,9 @@ class GuitarSynth {
 
     // Set shared audio context
     setAudioContext(ctx) {
+        if (this.masterGain) {
+            this.masterGain.disconnect();
+        }
         this.audioContext = ctx;
         this.masterGain = ctx.createGain();
         this.masterGain.gain.value = 0.7;
@@ -42,7 +47,7 @@ class GuitarSynth {
         const data = buffer.getChannelData(0);
         
         // Calculate delay line length based on frequency
-        const delayLength = Math.round(sampleRate / frequency);
+        const delayLength = Math.max(1, Math.round(sampleRate / frequency));
         const delayLine = new Float32Array(delayLength);
         
         // Initialize with noise burst (pluck excitation)
@@ -51,8 +56,8 @@ class GuitarSynth {
         }
         
         // Karplus-Strong synthesis with lowpass filter
-        const damping = 0.996; // Controls decay rate
-        const brightness = 0.5; // Controls tone brightness
+        const damping = DEFAULT_DAMPING;
+        const brightness = DEFAULT_BRIGHTNESS;
         let delayIndex = 0;
         
         for (let i = 0; i < samples; i++) {
@@ -70,7 +75,7 @@ class GuitarSynth {
         return buffer;
     }
 
-    // Play a single note with harmonics for richer sound
+    // Play a single note using plucked string synthesis
     playNote(frequency, duration = 1.5, velocity = 0.7) {
         const now = this.audioContext.currentTime;
         const source = this.audioContext.createBufferSource();
@@ -94,8 +99,8 @@ class GuitarSynth {
     // Play a chord (multiple notes)
     playChord(chordName, duration = 2.0, strum = 0.03) {
         const frequencies = GUITAR_NOTES[chordName];
-        if (!frequencies) {
-            console.error('Unknown chord:', chordName);
+        if (!frequencies || !Array.isArray(frequencies)) {
+            console.error('Unknown chord or invalid format:', chordName);
             return;
         }
         
@@ -233,6 +238,9 @@ class DrumSynth {
 
     // Set shared audio context
     setAudioContext(ctx) {
+        if (this.masterGain) {
+            this.masterGain.disconnect();
+        }
         this.audioContext = ctx;
         this.masterGain = ctx.createGain();
         this.masterGain.gain.value = 0.8;

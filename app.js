@@ -384,10 +384,14 @@ function setupKeyboardShortcuts() {
             if (btn) addVisualFeedback(btn);
         }
         
-        // Space for strum
+        // Space for strum - only prevent default if a chord button is focused
         if (key === ' ') {
-            e.preventDefault();
-            guitarSynth.strum('down', 'Em');
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement.classList && activeElement.classList.contains('chord-btn')) {
+                e.preventDefault();
+                const chord = activeElement.dataset.chord || 'Em';
+                guitarSynth.strum('down', chord);
+            }
         }
     });
 }

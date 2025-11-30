@@ -327,6 +327,10 @@ class AudioEffects {
             setMix: (wetAmount) => {
                 wet.gain.value = Math.min(1, Math.max(0, wetAmount));
                 dry.gain.value = 1 - wet.gain.value;
+            },
+            cleanup: () => {
+                lfo1.stop();
+                lfo2.stop();
             }
         };
     }
@@ -360,6 +364,9 @@ class AudioEffects {
             },
             setDepth: (amount) => {
                 depth.gain.value = Math.min(1, Math.max(0, amount));
+            },
+            cleanup: () => {
+                lfo.stop();
             }
         };
     }
@@ -429,14 +436,17 @@ class AudioEffects {
             },
             setFeedback: (amount) => {
                 feedback.gain.value = Math.min(0.95, Math.max(0, amount));
+            },
+            cleanup: () => {
+                lfo.stop();
             }
         };
     }
 
     // Apply an effect to a buffer and return processed buffer
-    // Note: A new AudioEffects instance is required here because Web Audio nodes
-    // cannot be shared between different AudioContext instances. OfflineAudioContext
-    // is used for non-real-time rendering.
+    // Note: Web Audio nodes cannot be shared between different AudioContext instances.
+    // This method temporarily swaps the context in createSingleEffect to create the effect
+    // for the OfflineAudioContext, which is used for non-real-time rendering.
     async processBuffer(inputBuffer, effectName, params = {}) {
         const offlineContext = new OfflineAudioContext(
             inputBuffer.numberOfChannels,
@@ -469,7 +479,7 @@ class AudioEffects {
         return await offlineContext.startRendering();
     }
 
-    // Create a single effect for offline processing (more efficient than full AudioEffects instance)
+    // Create a single effect for offline processing using a different context
     createSingleEffect(context, effectName) {
         // Store original context and temporarily swap
         const originalContext = this.audioContext;
