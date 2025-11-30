@@ -3,11 +3,16 @@
 // This file wires up the recording studio UI with the audio engine, visualizer, soundboard, and all recording controls.
 
 import SampleManager from './sample-manager.js';
+import { GuitarSynth, DrumSynth, GUITAR_NOTES } from './synths.js';
+import AudioEffects from './effects.js';
 
 // Global state
 let audioContext;
 let sampleManager;
 let loadedAudioBuffer = null;
+let guitarSynth;
+let drumSynth;
+let audioEffects;
 
 function init() {
     // Initialize audio context
@@ -16,12 +21,21 @@ function init() {
     // Initialize sample manager
     sampleManager = new SampleManager(audioContext);
     
+    // Initialize instruments with shared audio context
+    guitarSynth = new GuitarSynth(audioContext);
+    drumSynth = new DrumSynth(audioContext);
+    
+    // Initialize effects
+    audioEffects = new AudioEffects(audioContext);
+    
     // Setup event listeners
     setupSongLoader();
     setupSampleEditor();
     setupSoundboard();
+    setupInstruments();
+    setupKeyboardShortcuts();
     
-    console.log('Application initialized');
+    console.log('Application initialized with enhanced audio');
 }
 
 // Song Loader functionality
@@ -169,6 +183,7 @@ function createSoundboardPad(sample) {
     playBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         sampleManager.playSample(sample.id);
+        addVisualFeedback(pad);
     });
     
     // Remove button handler
@@ -200,12 +215,188 @@ function createSoundboardPad(sample) {
     // Click on pad to play
     pad.addEventListener('click', () => {
         sampleManager.playSample(sample.id);
+        addVisualFeedback(pad);
     });
     
     return pad;
 }
 
-// Draw waveform visualization
+// Visual feedback for button presses
+function addVisualFeedback(element) {
+    element.classList.add('active');
+    setTimeout(() => {
+        element.classList.remove('active');
+    }, 150);
+}
+
+// Setup virtual instruments (Guitar and Drums)
+function setupInstruments() {
+    // Guitar chord buttons
+    document.querySelectorAll('.chord-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const chord = btn.dataset.chord;
+            guitarSynth.playChord(chord);
+            addVisualFeedback(btn);
+        });
+    });
+    
+    // Guitar note buttons
+    document.querySelectorAll('.note-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const noteName = btn.dataset.note;
+            const freq = GUITAR_NOTES[noteName];
+            if (freq) {
+                guitarSynth.playNote(freq);
+                addVisualFeedback(btn);
+            }
+        });
+    });
+    
+    // Guitar strum buttons
+    const strumDownBtn = document.getElementById('strumDownBtn');
+    const strumUpBtn = document.getElementById('strumUpBtn');
+    const fingerpickBtn = document.getElementById('fingerpickBtn');
+    
+    if (strumDownBtn) {
+        strumDownBtn.addEventListener('click', () => {
+            guitarSynth.strum('down', 'Em');
+            addVisualFeedback(strumDownBtn);
+        });
+    }
+    
+    if (strumUpBtn) {
+        strumUpBtn.addEventListener('click', () => {
+            guitarSynth.strum('up', 'Em');
+            addVisualFeedback(strumUpBtn);
+        });
+    }
+    
+    if (fingerpickBtn) {
+        fingerpickBtn.addEventListener('click', () => {
+            guitarSynth.fingerpick('Am');
+            addVisualFeedback(fingerpickBtn);
+        });
+    }
+    
+    // Drum pad buttons
+    document.querySelectorAll('.drum-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const drum = btn.dataset.drum;
+            playDrumSound(drum);
+            addVisualFeedback(btn);
+        });
+    });
+    
+    // Play beat button
+    const playBeatBtn = document.getElementById('playBeatBtn');
+    const tempoInput = document.getElementById('tempoInput');
+    
+    if (playBeatBtn) {
+        playBeatBtn.addEventListener('click', () => {
+            const tempo = parseInt(tempoInput.value) || 120;
+            drumSynth.playBeat(tempo, 2);
+            addVisualFeedback(playBeatBtn);
+        });
+    }
+}
+
+// Play drum sound based on type
+function playDrumSound(type) {
+    switch (type) {
+        case 'kick':
+            drumSynth.playKick();
+            break;
+        case 'snare':
+            drumSynth.playSnare();
+            break;
+        case 'hihat':
+            drumSynth.playHiHat();
+            break;
+        case 'openhat':
+            drumSynth.playOpenHiHat();
+            break;
+        case 'tom-high':
+            drumSynth.playTom('high');
+            break;
+        case 'tom-mid':
+            drumSynth.playTom('mid');
+            break;
+        case 'tom-low':
+            drumSynth.playTom('low');
+            break;
+        case 'crash':
+            drumSynth.playCrash();
+            break;
+        case 'ride':
+            drumSynth.playRide();
+            break;
+        case 'clap':
+            drumSynth.playClap();
+            break;
+        case 'rimshot':
+            drumSynth.playRimshot();
+            break;
+    }
+}
+
+// Keyboard shortcuts for instruments
+function setupKeyboardShortcuts() {
+    const drumKeyMap = {
+        'q': 'kick',
+        'w': 'snare',
+        'e': 'hihat',
+        'r': 'openhat',
+        't': 'tom-high',
+        'y': 'tom-mid',
+        'u': 'tom-low',
+        'i': 'crash',
+        'o': 'ride',
+        'p': 'clap'
+    };
+    
+    const guitarKeyMap = {
+        'a': 'Am',
+        's': 'Em',
+        'd': 'G',
+        'f': 'D',
+        'g': 'C'
+    };
+    
+    document.addEventListener('keydown', (e) => {
+        // Ignore if typing in input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            return;
+        }
+        
+        const key = e.key.toLowerCase();
+        
+        // Drum shortcuts
+        if (drumKeyMap[key]) {
+            playDrumSound(drumKeyMap[key]);
+            const btn = document.querySelector(`[data-drum="${drumKeyMap[key]}"]`);
+            if (btn) addVisualFeedback(btn);
+        }
+        
+        // Guitar chord shortcuts
+        if (guitarKeyMap[key]) {
+            guitarSynth.playChord(guitarKeyMap[key]);
+            const btn = document.querySelector(`[data-chord="${guitarKeyMap[key]}"]`);
+            if (btn) addVisualFeedback(btn);
+        }
+        
+        // Space for strum - only prevent default if a chord button is focused
+        if (key === ' ') {
+            const activeElement = document.activeElement;
+            if (activeElement && activeElement.classList && activeElement.classList.contains('chord-btn')) {
+                e.preventDefault();
+                const chord = activeElement.dataset.chord || 'Em';
+                guitarSynth.strum('down', chord);
+            }
+        }
+    });
+}
+
+// Draw waveform visualization - optimized for performance
 function drawWaveform(audioBuffer) {
     const canvas = document.getElementById('waveformCanvas');
     const ctx = canvas.getContext('2d');
@@ -221,14 +412,34 @@ function drawWaveform(audioBuffer) {
     const step = Math.ceil(data.length / width);
     const amp = height / 2;
     
-    // Draw waveform
+    // Draw waveform - optimized: avoid creating arrays with slice()
     ctx.strokeStyle = '#1DB954';
     ctx.lineWidth = 1;
     ctx.beginPath();
     
+    // Handle empty audio buffer
+    if (data.length === 0) {
+        return;
+    }
+    
     for (let i = 0; i < width; i++) {
-        const min = Math.min(...data.slice(i * step, (i + 1) * step));
-        const max = Math.max(...data.slice(i * step, (i + 1) * step));
+        const start = i * step;
+        const end = Math.min(start + step, data.length);
+        
+        // Skip if start is beyond data length
+        if (start >= data.length) {
+            break;
+        }
+        
+        let min = data[start];
+        let max = data[start];
+        
+        // Calculate min/max without creating new arrays
+        for (let j = start + 1; j < end; j++) {
+            const val = data[j];
+            if (val < min) min = val;
+            if (val > max) max = val;
+        }
         
         ctx.moveTo(i, (1 + min) * amp);
         ctx.lineTo(i, (1 + max) * amp);

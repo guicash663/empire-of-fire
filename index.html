@@ -54,15 +54,77 @@
                 <!-- Dynamic soundboard pads will be created here -->
             </div>
         </section>
+        <section id="instruments">
+            <h2>Virtual Instruments</h2>
+            <div class="instruments-container">
+                <div class="instrument-section">
+                    <h3>🎸 Guitar</h3>
+                    <div class="guitar-controls">
+                        <div class="chord-buttons">
+                            <button class="chord-btn" data-chord="Am" aria-label="Play A minor chord">Am</button>
+                            <button class="chord-btn" data-chord="Em" aria-label="Play E minor chord">Em</button>
+                            <button class="chord-btn" data-chord="G" aria-label="Play G major chord">G</button>
+                            <button class="chord-btn" data-chord="D" aria-label="Play D major chord">D</button>
+                            <button class="chord-btn" data-chord="C" aria-label="Play C major chord">C</button>
+                        </div>
+                        <div class="note-buttons">
+                            <button class="note-btn" data-note="E2">E2</button>
+                            <button class="note-btn" data-note="A2">A2</button>
+                            <button class="note-btn" data-note="D3">D3</button>
+                            <button class="note-btn" data-note="G3">G3</button>
+                            <button class="note-btn" data-note="B3">B3</button>
+                            <button class="note-btn" data-note="E4">E4</button>
+                        </div>
+                        <div class="guitar-actions">
+                            <button id="strumDownBtn">Strum ↓</button>
+                            <button id="strumUpBtn">Strum ↑</button>
+                            <button id="fingerpickBtn">Fingerpick</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="instrument-section">
+                    <h3>🥁 Drums</h3>
+                    <div class="drum-pads">
+                        <button class="drum-btn kick" data-drum="kick" aria-label="Play kick drum sound">Kick</button>
+                        <button class="drum-btn snare" data-drum="snare" aria-label="Play snare drum sound">Snare</button>
+                        <button class="drum-btn hihat" data-drum="hihat" aria-label="Play hi-hat sound">Hi-Hat</button>
+                        <button class="drum-btn openhat" data-drum="openhat" aria-label="Play open hi-hat sound">Open Hat</button>
+                        <button class="drum-btn tom-high" data-drum="tom-high" aria-label="Play high tom sound">Tom Hi</button>
+                        <button class="drum-btn tom-mid" data-drum="tom-mid" aria-label="Play mid tom sound">Tom Mid</button>
+                        <button class="drum-btn tom-low" data-drum="tom-low" aria-label="Play low tom sound">Tom Lo</button>
+                        <button class="drum-btn crash" data-drum="crash" aria-label="Play crash cymbal sound">Crash</button>
+                        <button class="drum-btn ride" data-drum="ride" aria-label="Play ride cymbal sound">Ride</button>
+                        <button class="drum-btn clap" data-drum="clap" aria-label="Play clap sound">Clap</button>
+                        <button class="drum-btn rimshot" data-drum="rimshot" aria-label="Play rimshot sound">Rimshot</button>
+                    </div>
+                    <div class="drum-actions">
+                        <button id="playBeatBtn">Play Beat</button>
+                        <label>Tempo: <input type="number" id="tempoInput" value="120" min="60" max="200"></label>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section id="effects-controls">
             <h2>Effects Controls</h2>
-            <label for="effects">Choose an effect:</label>
-            <select id="effects">
-                <option value="reverb">Reverb</option>
-                <option value="echo">Echo</option>
-                <option value="compressor">Compressor</option>
-            </select>
-            <button id="applyEffectBtn">Apply Effect</button>
+            <div class="effects-grid">
+                <div class="effect-panel">
+                    <label for="effects">Effect Type:</label>
+                    <select id="effects">
+                        <option value="reverb">Reverb</option>
+                        <option value="echo">Echo</option>
+                        <option value="compressor">Compressor</option>
+                        <option value="distortion">Distortion</option>
+                        <option value="chorus">Chorus</option>
+                        <option value="phaser">Phaser</option>
+                        <option value="tremolo">Tremolo</option>
+                    </select>
+                    <button id="applyEffectBtn">Apply Effect</button>
+                </div>
+                <div class="effect-params">
+                    <label>Mix: <input type="range" id="effectMix" min="0" max="100" value="30"></label>
+                    <label>Amount: <input type="range" id="effectAmount" min="0" max="100" value="50"></label>
+                </div>
+            </div>
         </section>
         <section id="auto-tune">
             <h2>Auto-Tune Interface</h2>
