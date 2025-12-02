@@ -27,13 +27,33 @@ createAudioCore().then(module => {
     };
 });
 
+// Global stream reference for cleanup
+let currentStream = null;
+
 // START
 document.getElementById('boot').onclick = async () => {
-    if(isLive) { location.reload(); return; } // Reset button hack for stability
+    if(isLive) { 
+        // Proper cleanup instead of reload
+        isLive = false;
+        if (scriptNode) {
+            scriptNode.disconnect();
+            source.disconnect();
+        }
+        if (audioCtx) {
+            await audioCtx.close();
+        }
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+        }
+        document.getElementById('boot').classList.remove('live');
+        document.getElementById('boot').innerText = "POWER ON";
+        document.getElementById('rec').disabled = true;
+        return;
+    }
     
     audioCtx = new AudioContext({latencyHint: 'interactive'}); // 'interactive' for low-latency real-time audio processing
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    source = audioCtx.createMediaStreamSource(stream);
+    currentStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    source = audioCtx.createMediaStreamSource(currentStream);
     
     // Recorder Destination
     const dest = audioCtx.createMediaStreamDestination();
