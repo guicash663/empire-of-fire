@@ -31,7 +31,7 @@ createAudioCore().then(module => {
 document.getElementById('boot').onclick = async () => {
     if(isLive) { location.reload(); return; } // Reset button hack for stability
     
-    audioCtx = new AudioContext({latencyHint: 'playback'}); // 'playback' gives more stability than 'interactive' for intensive stuff
+    audioCtx = new AudioContext({latencyHint: 'interactive'}); // 'interactive' for low-latency real-time audio processing
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     source = audioCtx.createMediaStreamSource(stream);
     
@@ -41,6 +41,8 @@ document.getElementById('boot').onclick = async () => {
     mediaRecorder.ondataavailable = e => chunks.push(e.data);
     mediaRecorder.onstop = saveRecording;
 
+    // Note: ScriptProcessorNode is deprecated but still functional
+    // AudioWorklet would be preferred for production but requires more complex setup
     scriptNode = audioCtx.createScriptProcessor(BUFFER_SIZE, 1, 1);
     scriptNode.onaudioprocess = (e) => {
         const input = e.inputBuffer.getChannelData(0);
