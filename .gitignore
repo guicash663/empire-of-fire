@@ -14,3 +14,4 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+_codeql_detected_source_root
