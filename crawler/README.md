@@ -160,6 +160,19 @@ Download crawl results as a text file.
 **Issue**: Timeout errors
 - **Solution**: The website may be slow or blocking requests. Try a different website or increase the timeout value in `app.py`
 
+## Security Considerations
+
+**⚠️ IMPORTANT: This application is designed for development and educational purposes.**
+
+- The Flask app runs in **debug mode** by default. For production use:
+  - Set `debug=False` in `app.py`
+  - Use a production WSGI server like Gunicorn or uWSGI
+  - Implement proper authentication and rate limiting
+  - Add input validation and sanitization
+- Always respect website terms of service and robots.txt when crawling
+- This crawler does not implement rate limiting or robots.txt checking
+- Only use this tool on websites you own or have explicit permission to crawl
+
 ## License
 
 This project is part of the Empire of Fire repository and follows the same license terms.

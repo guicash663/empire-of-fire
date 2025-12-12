@@ -183,4 +183,6 @@ def download():
     )
 
 if __name__ == '__main__':
+    # NOTE: Debug mode is enabled for development. 
+    # For production use, set debug=False and use a production WSGI server
     app.run(debug=True, port=5000)
