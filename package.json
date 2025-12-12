@@ -1,0 +1,11 @@
+{
+  "name": "vocal-lab-pro",
+  "version": "2.0.0",
+  "scripts": {
+    "build:wasm": "mkdir -p public/wasm && emcc src/algorithms/vocal_engine.cpp -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME='createAudioCore' -s EXPORTED_FUNCTIONS='[\"_process_frame\",\"_malloc\",\"_free\",\"_set_key\",\"_reset_state\"]' -s EXPORTED_RUNTIME_METHODS='[\"getValue\",\"setValue\"]' -s ALLOW_MEMORY_GROWTH=1 -msimd128 -O3 -flto -o public/wasm/audio_core.js",
+    "dev": "npx http-server public -p 3000"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
