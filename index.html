@@ -64,11 +64,27 @@
             </select>
             <button id="applyEffectBtn">Apply Effect</button>
         </section>
+        <section id="live-monitor">
+            <h2>Live Audio Monitor</h2>
+            <div id="liveMonitorDisplay">
+                <canvas id="liveMonitorCanvas" width="800" height="150"></canvas>
+            </div>
+            <div class="monitor-controls">
+                <label>
+                    <input type="checkbox" id="liveMonitorToggle"> Enable Live Monitor
+                </label>
+                <button id="startMonitorBtn">Start Monitoring</button>
+                <button id="stopMonitorBtn">Stop Monitoring</button>
+            </div>
+        </section>
         <section id="auto-tune">
             <h2>Auto-Tune Interface</h2>
             <label>
                 <input type="checkbox" id="autoTuneToggle"> Enable Auto-Tune
             </label>
+            <div id="autoTuneControls" class="auto-tune-grid">
+                <!-- Auto-tune parameters will be dynamically created here -->
+            </div>
         </section>
     </main>
     <footer>
