@@ -8,6 +8,12 @@ import SampleManager from './sample-manager.js';
 let audioContext;
 let sampleManager;
 let loadedAudioBuffer = null;
+let liveMonitorActive = false;
+let liveMonitorStream = null;
+let liveMonitorAnalyser = null;
+let liveMonitorAnimationId = null;
+let autoTuneEnabled = false;
+let autoTuneParams = {};
 
 function init() {
     // Initialize audio context
@@ -20,6 +26,8 @@ function init() {
     setupSongLoader();
     setupSampleEditor();
     setupSoundboard();
+    setupLiveMonitor();
+    setupAutoTune();
     
     console.log('Application initialized');
 }
@@ -242,6 +250,243 @@ function drawWaveform(audioBuffer) {
     ctx.moveTo(0, amp);
     ctx.lineTo(width, amp);
     ctx.stroke();
+}
+
+// Live Monitor Setup
+function setupLiveMonitor() {
+    const liveMonitorToggle = document.getElementById('liveMonitorToggle');
+    const startMonitorBtn = document.getElementById('startMonitorBtn');
+    const stopMonitorBtn = document.getElementById('stopMonitorBtn');
+    
+    startMonitorBtn.addEventListener('click', async () => {
+        try {
+            await startLiveMonitor();
+            liveMonitorToggle.checked = true;
+            startMonitorBtn.disabled = true;
+            stopMonitorBtn.disabled = false;
+        } catch (error) {
+            alert('Error starting live monitor: ' + error.message);
+            console.error(error);
+        }
+    });
+    
+    stopMonitorBtn.addEventListener('click', () => {
+        stopLiveMonitor();
+        liveMonitorToggle.checked = false;
+        startMonitorBtn.disabled = false;
+        stopMonitorBtn.disabled = true;
+    });
+    
+    liveMonitorToggle.addEventListener('change', async (e) => {
+        if (e.target.checked) {
+            try {
+                await startLiveMonitor();
+                startMonitorBtn.disabled = true;
+                stopMonitorBtn.disabled = false;
+            } catch (error) {
+                alert('Error starting live monitor: ' + error.message);
+                console.error(error);
+                e.target.checked = false;
+            }
+        } else {
+            stopLiveMonitor();
+            startMonitorBtn.disabled = false;
+            stopMonitorBtn.disabled = true;
+        }
+    });
+    
+    // Initialize button states
+    stopMonitorBtn.disabled = true;
+}
+
+async function startLiveMonitor() {
+    if (liveMonitorActive) {
+        return;
+    }
+    
+    // Request microphone access
+    liveMonitorStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    // Create analyser node
+    liveMonitorAnalyser = audioContext.createAnalyser();
+    liveMonitorAnalyser.fftSize = 2048;
+    
+    // Connect stream to analyser
+    const source = audioContext.createMediaStreamSource(liveMonitorStream);
+    source.connect(liveMonitorAnalyser);
+    
+    liveMonitorActive = true;
+    
+    // Start drawing
+    drawLiveMonitor();
+    
+    console.log('Live monitor started');
+}
+
+function stopLiveMonitor() {
+    if (!liveMonitorActive) {
+        return;
+    }
+    
+    // Stop animation
+    if (liveMonitorAnimationId) {
+        cancelAnimationFrame(liveMonitorAnimationId);
+        liveMonitorAnimationId = null;
+    }
+    
+    // Stop media stream
+    if (liveMonitorStream) {
+        liveMonitorStream.getTracks().forEach(track => track.stop());
+        liveMonitorStream = null;
+    }
+    
+    liveMonitorAnalyser = null;
+    liveMonitorActive = false;
+    
+    // Clear canvas
+    const canvas = document.getElementById('liveMonitorCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    console.log('Live monitor stopped');
+}
+
+function drawLiveMonitor() {
+    if (!liveMonitorActive || !liveMonitorAnalyser) {
+        return;
+    }
+    
+    const canvas = document.getElementById('liveMonitorCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    const bufferLength = liveMonitorAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    
+    liveMonitorAnimationId = requestAnimationFrame(drawLiveMonitor);
+    
+    liveMonitorAnalyser.getByteTimeDomainData(dataArray);
+    
+    // Clear canvas
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw waveform
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#1DB954';
+    ctx.beginPath();
+    
+    const sliceWidth = width / bufferLength;
+    let x = 0;
+    
+    for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = (v * height) / 2;
+        
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+        
+        x += sliceWidth;
+    }
+    
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+    
+    // Draw center line
+    ctx.strokeStyle = '#333';
+    ctx.beginPath();
+    ctx.moveTo(0, height / 2);
+    ctx.lineTo(width, height / 2);
+    ctx.stroke();
+}
+
+// Auto-Tune Setup
+function setupAutoTune() {
+    const autoTuneToggle = document.getElementById('autoTuneToggle');
+    const autoTuneControls = document.getElementById('autoTuneControls');
+    
+    // Define 24 auto-tune parameters
+    const parameters = [
+        { id: 'pitchCorrection', name: 'Pitch Correction', min: 0, max: 100, default: 50, unit: '%', step: 1, precision: 0 },
+        { id: 'retune', name: 'Retune Speed', min: 0, max: 400, default: 50, unit: 'ms', step: 1, precision: 0 },
+        { id: 'humanize', name: 'Humanize', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 },
+        { id: 'naturalVibrato', name: 'Natural Vibrato', min: 0, max: 100, default: 50, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchA', name: 'Target Note A', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchB', name: 'Target Note B', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchC', name: 'Target Note C', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchD', name: 'Target Note D', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchE', name: 'Target Note E', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchF', name: 'Target Note F', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchG', name: 'Target Note G', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'formantShift', name: 'Formant Shift', min: -12, max: 12, default: 0, unit: 'st', step: 0.1, precision: 1 },
+        { id: 'throatLength', name: 'Throat Length', min: 50, max: 150, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'breathiness', name: 'Breathiness', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 },
+        { id: 'vibrato', name: 'Vibrato', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 },
+        { id: 'vibratoRate', name: 'Vibrato Rate', min: 1, max: 10, default: 5, unit: 'Hz', step: 0.1, precision: 1 },
+        { id: 'vibratoDepth', name: 'Vibrato Depth', min: 0, max: 100, default: 20, unit: 'cents', step: 1, precision: 0 },
+        { id: 'pitchShift', name: 'Pitch Shift', min: -12, max: 12, default: 0, unit: 'st', step: 0.1, precision: 1 },
+        { id: 'mixDryWet', name: 'Mix (Dry/Wet)', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'outputGain', name: 'Output Gain', min: -20, max: 20, default: 0, unit: 'dB', step: 0.5, precision: 1 },
+        { id: 'inputGain', name: 'Input Gain', min: -20, max: 20, default: 0, unit: 'dB', step: 0.5, precision: 1 },
+        { id: 'lowCut', name: 'Low Cut', min: 20, max: 500, default: 80, unit: 'Hz', step: 10, precision: 0 },
+        { id: 'highCut', name: 'High Cut', min: 2000, max: 20000, default: 15000, unit: 'Hz', step: 100, precision: 0 },
+        { id: 'scaleLock', name: 'Scale Lock', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 }
+    ];
+    
+    // Initialize parameters
+    parameters.forEach(param => {
+        autoTuneParams[param.id] = param.default;
+    });
+    
+    // Create parameter controls
+    parameters.forEach(param => {
+        const paramDiv = document.createElement('div');
+        paramDiv.className = 'auto-tune-param';
+        
+        const valueId = `${param.id}-value`;
+        
+        paramDiv.innerHTML = `
+            <label for="${param.id}">${param.name}</label>
+            <input type="range" 
+                   id="${param.id}" 
+                   min="${param.min}" 
+                   max="${param.max}" 
+                   value="${param.default}" 
+                   step="${param.step}">
+            <span class="param-value" id="${valueId}">${param.default}${param.unit}</span>
+        `;
+        
+        const slider = paramDiv.querySelector('input');
+        const valueDisplay = paramDiv.querySelector('.param-value');
+        
+        slider.addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            autoTuneParams[param.id] = value;
+            valueDisplay.textContent = `${value.toFixed(param.precision)}${param.unit}`;
+        });
+        
+        autoTuneControls.appendChild(paramDiv);
+    });
+    
+    // Toggle auto-tune
+    autoTuneToggle.addEventListener('change', (e) => {
+        autoTuneEnabled = e.target.checked;
+        autoTuneControls.style.display = autoTuneEnabled ? 'grid' : 'none';
+        
+        if (autoTuneEnabled) {
+            console.log('Auto-tune enabled with parameters:', autoTuneParams);
+        } else {
+            console.log('Auto-tune disabled');
+        }
+    });
+    
+    // Initially hide controls
+    autoTuneControls.style.display = 'none';
 }
 
 // Run the application
