@@ -234,13 +234,6 @@ section h2 {
 }
 
 /* Live Monitor Styles */
-#live-monitor {
-    margin: 20px 0;
-    padding: 20px;
-    background: #1a1a1a;
-    border-radius: 10px;
-}
-
 #liveMonitorDisplay {
     margin: 15px 0;
     background: #000;
@@ -282,13 +275,6 @@ section h2 {
 }
 
 /* Auto-Tune Styles */
-#auto-tune {
-    margin: 20px 0;
-    padding: 20px;
-    background: #1a1a1a;
-    border-radius: 10px;
-}
-
 .auto-tune-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

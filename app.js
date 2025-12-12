@@ -412,30 +412,30 @@ function setupAutoTune() {
     
     // Define 24 auto-tune parameters
     const parameters = [
-        { id: 'pitchCorrection', name: 'Pitch Correction', min: 0, max: 100, default: 50, unit: '%' },
-        { id: 'retune', name: 'Retune Speed', min: 0, max: 400, default: 50, unit: 'ms' },
-        { id: 'humanize', name: 'Humanize', min: 0, max: 100, default: 0, unit: '%' },
-        { id: 'naturalVibrato', name: 'Natural Vibrato', min: 0, max: 100, default: 50, unit: '%' },
-        { id: 'targetPitchA', name: 'Target Note A', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'targetPitchB', name: 'Target Note B', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'targetPitchC', name: 'Target Note C', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'targetPitchD', name: 'Target Note D', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'targetPitchE', name: 'Target Note E', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'targetPitchF', name: 'Target Note F', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'targetPitchG', name: 'Target Note G', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'formantShift', name: 'Formant Shift', min: -12, max: 12, default: 0, unit: 'st' },
-        { id: 'throatLength', name: 'Throat Length', min: 50, max: 150, default: 100, unit: '%' },
-        { id: 'breathiness', name: 'Breathiness', min: 0, max: 100, default: 0, unit: '%' },
-        { id: 'vibrato', name: 'Vibrato', min: 0, max: 100, default: 0, unit: '%' },
-        { id: 'vibratoRate', name: 'Vibrato Rate', min: 1, max: 10, default: 5, unit: 'Hz' },
-        { id: 'vibratoDepth', name: 'Vibrato Depth', min: 0, max: 100, default: 20, unit: 'cents' },
-        { id: 'pitchShift', name: 'Pitch Shift', min: -12, max: 12, default: 0, unit: 'st' },
-        { id: 'mixDryWet', name: 'Mix (Dry/Wet)', min: 0, max: 100, default: 100, unit: '%' },
-        { id: 'outputGain', name: 'Output Gain', min: -20, max: 20, default: 0, unit: 'dB' },
-        { id: 'inputGain', name: 'Input Gain', min: -20, max: 20, default: 0, unit: 'dB' },
-        { id: 'lowCut', name: 'Low Cut', min: 20, max: 500, default: 80, unit: 'Hz' },
-        { id: 'highCut', name: 'High Cut', min: 2000, max: 20000, default: 15000, unit: 'Hz' },
-        { id: 'scaleLock', name: 'Scale Lock', min: 0, max: 100, default: 0, unit: '%' }
+        { id: 'pitchCorrection', name: 'Pitch Correction', min: 0, max: 100, default: 50, unit: '%', step: 1, precision: 0 },
+        { id: 'retune', name: 'Retune Speed', min: 0, max: 400, default: 50, unit: 'ms', step: 1, precision: 0 },
+        { id: 'humanize', name: 'Humanize', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 },
+        { id: 'naturalVibrato', name: 'Natural Vibrato', min: 0, max: 100, default: 50, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchA', name: 'Target Note A', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchB', name: 'Target Note B', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchC', name: 'Target Note C', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchD', name: 'Target Note D', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchE', name: 'Target Note E', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchF', name: 'Target Note F', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'targetPitchG', name: 'Target Note G', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'formantShift', name: 'Formant Shift', min: -12, max: 12, default: 0, unit: 'st', step: 0.1, precision: 1 },
+        { id: 'throatLength', name: 'Throat Length', min: 50, max: 150, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'breathiness', name: 'Breathiness', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 },
+        { id: 'vibrato', name: 'Vibrato', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 },
+        { id: 'vibratoRate', name: 'Vibrato Rate', min: 1, max: 10, default: 5, unit: 'Hz', step: 0.1, precision: 1 },
+        { id: 'vibratoDepth', name: 'Vibrato Depth', min: 0, max: 100, default: 20, unit: 'cents', step: 1, precision: 0 },
+        { id: 'pitchShift', name: 'Pitch Shift', min: -12, max: 12, default: 0, unit: 'st', step: 0.1, precision: 1 },
+        { id: 'mixDryWet', name: 'Mix (Dry/Wet)', min: 0, max: 100, default: 100, unit: '%', step: 1, precision: 0 },
+        { id: 'outputGain', name: 'Output Gain', min: -20, max: 20, default: 0, unit: 'dB', step: 0.5, precision: 1 },
+        { id: 'inputGain', name: 'Input Gain', min: -20, max: 20, default: 0, unit: 'dB', step: 0.5, precision: 1 },
+        { id: 'lowCut', name: 'Low Cut', min: 20, max: 500, default: 80, unit: 'Hz', step: 10, precision: 0 },
+        { id: 'highCut', name: 'High Cut', min: 2000, max: 20000, default: 15000, unit: 'Hz', step: 100, precision: 0 },
+        { id: 'scaleLock', name: 'Scale Lock', min: 0, max: 100, default: 0, unit: '%', step: 1, precision: 0 }
     ];
     
     // Initialize parameters
@@ -457,7 +457,7 @@ function setupAutoTune() {
                    min="${param.min}" 
                    max="${param.max}" 
                    value="${param.default}" 
-                   step="${(param.max - param.min) / 100}">
+                   step="${param.step}">
             <span class="param-value" id="${valueId}">${param.default}${param.unit}</span>
         `;
         
@@ -467,7 +467,7 @@ function setupAutoTune() {
         slider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             autoTuneParams[param.id] = value;
-            valueDisplay.textContent = `${value.toFixed(1)}${param.unit}`;
+            valueDisplay.textContent = `${value.toFixed(param.precision)}${param.unit}`;
         });
         
         autoTuneControls.appendChild(paramDiv);
