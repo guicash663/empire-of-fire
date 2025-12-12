@@ -1,0 +1,24 @@
+{
+  "name": "empire-of-fire",
+  "version": "1.0.0",
+  "description": "Recording Studio - Web-based audio recording, editing, and soundboard application. Termux compatible.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "recording",
+    "audio",
+    "studio",
+    "soundboard",
+    "termux",
+    "android"
+  ],
+  "author": "guicash663",
+  "license": "MIT",
+  "dependencies": {},
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}
