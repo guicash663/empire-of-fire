@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🕷️ Web Crawler</h1>
+            <p class="subtitle">Crawl websites and extract text content</p>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <div class="input-group">
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        placeholder="Enter website URL (e.g., https://example.com)"
+                        required
+                    >
+                    <button id="startBtn" class="btn-primary">Start Crawl</button>
+                </div>
+                <p class="help-text">The crawler will extract text from up to 50 pages within the same domain.</p>
+            </section>
+
+            <section class="status-section" id="statusSection" style="display: none;">
+                <div class="status-card">
+                    <div class="spinner"></div>
+                    <p class="status-text" id="statusText">Crawling in progress...</p>
+                    <p class="pages-count" id="pagesCount">Pages crawled: 0</p>
+                </div>
+            </section>
+
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <div class="results-actions">
+                        <span class="result-summary" id="resultSummary"></span>
+                        <button id="downloadBtn" class="btn-download">📥 Download Results</button>
+                    </div>
+                </div>
+                <div class="results-container" id="resultsContainer"></div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Built with Flask, BeautifulSoup4, and vanilla JavaScript</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
