@@ -4,7 +4,6 @@ import requests
 from urllib.parse import urljoin, urlparse
 from collections import deque
 import io
-import time
 
 app = Flask(__name__)
 
@@ -136,7 +135,7 @@ def crawl():
         parsed = urlparse(url)
         if not parsed.scheme or not parsed.netloc:
             return jsonify({'error': 'Invalid URL format'}), 400
-    except:
+    except Exception:
         return jsonify({'error': 'Invalid URL'}), 400
     
     # Create crawler and start crawling
