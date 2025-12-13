@@ -39,6 +39,11 @@ pip install -r requirements.txt
 python server.py
 ```
 
+For development with debug mode (not recommended for production):
+```bash
+FLASK_DEBUG=true python server.py
+```
+
 3. Open your browser to `http://localhost:5000`
 
 ## Usage
