@@ -10,7 +10,7 @@
  */
 
 class ArcaneListener {
-    constructor() {
+    constructor(options = {}) {
         this.isArmed = false;
         this.mediaRecorder = null;
         this.mediaStream = null;
@@ -19,10 +19,14 @@ class ArcaneListener {
         this.dataArray = null;
         this.lastUploadedFile = null;
         
-        // Configuration
-        this.chunkDuration = 10000; // 10 seconds in milliseconds
-        this.silenceThreshold = 0.01; // Amplitude threshold for silence detection
-        this.minChunkSize = 1024; // Minimum bytes to consider non-empty
+        // Configuration (with defaults, can be overridden via options)
+        this.chunkDuration = options.chunkDuration || 10000; // 10 seconds in milliseconds
+        this.silenceThreshold = options.silenceThreshold || 0.01; // Amplitude threshold for silence detection
+        this.minChunkSize = options.minChunkSize || 1024; // Minimum bytes to consider non-empty
+        this.fileListRefreshInterval = options.fileListRefreshInterval || 3; // Refresh every N uploads
+        
+        // Counters
+        this.uploadCount = 0;
         
         // UI elements
         this.armBtn = null;
@@ -212,8 +216,9 @@ class ArcaneListener {
                 this.setStatus('Uploaded chunk was empty - deleted');
             } else {
                 this.setStatus(`Uploaded: ${result.filename} (${this.formatBytes(result.size)})`);
-                // Refresh file list occasionally (but not every time to save cycles)
-                if (Math.random() < 0.3) {
+                // Refresh file list every N uploads to save cycles
+                this.uploadCount++;
+                if (this.uploadCount % this.fileListRefreshInterval === 0) {
                     this.loadFileList();
                 }
             }
@@ -322,6 +327,14 @@ class ArcaneListener {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    // Create listener with default options
+    // To customize, pass options object:
+    // const listener = new ArcaneListener({
+    //     chunkDuration: 10000,           // 10 seconds
+    //     silenceThreshold: 0.01,         // RMS amplitude threshold
+    //     minChunkSize: 1024,             // Minimum bytes
+    //     fileListRefreshInterval: 3      // Refresh every 3 uploads
+    // });
     const listener = new ArcaneListener();
     listener.init();
 });

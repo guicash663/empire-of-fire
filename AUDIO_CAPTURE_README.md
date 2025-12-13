@@ -87,7 +87,29 @@ Uses RMS (Root Mean Square) amplitude calculation:
 
 ## Configuration
 
-Edit `arcane-listener.js` to adjust:
+You can configure the audio capture behavior by passing options when initializing:
+
+```javascript
+const listener = new ArcaneListener({
+    chunkDuration: 10000,           // Chunk duration in ms (default: 10000)
+    silenceThreshold: 0.01,         // RMS amplitude threshold (default: 0.01)
+    minChunkSize: 1024,             // Minimum bytes for valid chunk (default: 1024)
+    fileListRefreshInterval: 3      // Refresh UI every N uploads (default: 3)
+});
+```
+
+### Configuration Options
+
+- **chunkDuration**: Time in milliseconds for each audio chunk (default: 10000 = 10 seconds)
+- **silenceThreshold**: RMS amplitude below this value is considered silence (default: 0.01)
+  - Lower values = stricter silence detection (more sensitive)
+  - Higher values = more lenient (allows quieter audio through)
+- **minChunkSize**: Minimum file size in bytes to keep (default: 1024)
+- **fileListRefreshInterval**: UI refreshes every N successful uploads to save CPU (default: 3)
+
+## Legacy Configuration (deprecated)
+
+Edit `arcane-listener.js` to adjust (use constructor options instead):
 
 ```javascript
 this.chunkDuration = 10000;      // Chunk duration in ms
